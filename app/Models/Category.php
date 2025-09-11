@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
-    protected $table = 'category';
+    protected $table = 'categories';
     
     protected $fillable = [
         'name',
@@ -17,8 +17,8 @@ class Category extends Model
         'image_url',
     ];
     
-    const CREATED_AT = 'createdAt';
-    const UPDATED_AT = 'updatedAt';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
     public function parent(): BelongsTo
     {

@@ -86,7 +86,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $categories = Category::all();
+        $categories = Category::where('id', '!=', 0)->get();
         return view('admin.products.create', compact('categories'));
     }
 
@@ -165,7 +165,7 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        $categories = Category::all();
+        $categories = Category::where('id', '!=', 0)->get();
         $product->load(['category']);
         return view('admin.products.edit', compact('product', 'categories'));
     }

@@ -119,43 +119,19 @@
                         </div>
                     </div>
 
-                    @if($voucher->usages->count() > 0)
-                    <div class="row mt-4">
+                    <!-- Lịch sử sử dụng voucher - Tạm thời ẩn vì không có bảng voucher_usage -->
+                    <!-- <div class="row mt-4">
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h5 class="mb-0">Lịch Sử Sử Dụng ({{ $voucher->usages->count() }} lần)</h5>
+                                    <h5 class="mb-0">Lịch Sử Sử Dụng</h5>
                                 </div>
                                 <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped">
-                                            <thead>
-                                                <tr>
-                                                    <th>ID</th>
-                                                    <th>User ID</th>
-                                                    <th>Đơn hàng</th>
-                                                    <th>Số tiền giảm</th>
-                                                    <th>Thời gian sử dụng</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($voucher->usages as $usage)
-                                                <tr>
-                                                    <td>{{ $usage->id }}</td>
-                                                    <td>{{ $usage->user_id }}</td>
-                                                    <td>{{ $usage->order_id }}</td>
-                                                    <td class="text-success fw-bold">{{ number_format($usage->discount_amount) }} ₫</td>
-                                                    <td>{{ \Carbon\Carbon::parse($usage->used_at)->format('d/m/Y H:i') }}</td>
-                                                </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                    <p class="text-muted">Chức năng này sẽ được cập nhật sau</p>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    @endif
+                    </div> -->
                 </div>
             </div>
         </div>

@@ -27,12 +27,41 @@ class OrderController extends Controller
     {
         $perPage = $request->get('limit', 10);
         $statusFilter = $request->get('status');
+        $timeFilter = $request->get('time');
+        $monthFilter = $request->get('month');
         
-        $query = \App\Models\Order::with('user')->orderBy('createdAt', 'desc');
+        $query = \App\Models\Order::with('user')->orderBy('created_at', 'desc');
         
         // Filter by status if provided
         if ($statusFilter) {
             $query->where('status', $statusFilter);
+        }
+        
+        // Filter by time range
+        if ($timeFilter) {
+            switch ($timeFilter) {
+                case 'today':
+                    $query->whereDate('created_at', today());
+                    break;
+                case 'week':
+                    $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+                    break;
+                case 'month':
+                    $query->whereMonth('created_at', now()->month)
+                          ->whereYear('created_at', now()->year);
+                    break;
+                case 'last_month':
+                    $query->whereMonth('created_at', now()->subMonth()->month)
+                          ->whereYear('created_at', now()->subMonth()->year);
+                    break;
+            }
+        }
+        
+        // Filter by specific month
+        if ($monthFilter) {
+            $monthDate = \Carbon\Carbon::createFromFormat('Y-m', $monthFilter);
+            $query->whereMonth('created_at', $monthDate->month)
+                  ->whereYear('created_at', $monthDate->year);
         }
         
         $orders = $query->paginate($perPage);

@@ -67,9 +67,9 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password123'), // Mật khẩu mặc định
                 'phone' => $phone,
                 'role' => $role,
-                'isEmailVerified' => rand(0, 1), // 50% chance verified
-                'createdAt' => $randomDate,
-                'updatedAt' => $randomDate,
+                'email_verified_at' => rand(0, 1) ? $randomDate : null, // 50% chance verified
+                'created_at' => $randomDate,
+                'updated_at' => $randomDate,
             ]);
         }
         

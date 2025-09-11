@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\Article;
+use App\Models\News;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -39,7 +39,7 @@ class DashboardController extends Controller
             'total_revenue' => Order::sum('total_price'),
             'total_products' => Product::count(),
             'total_reviews' => DB::table('reviews')->count(),
-            'total_articles' => Article::count(),
+            'total_articles' => News::count(),
             
             // Hôm nay
             'today_orders' => Order::whereDate('created_at', $today)->count(),
@@ -78,8 +78,8 @@ class DashboardController extends Controller
             'rejected_reviews' => DB::table('reviews')->where('status', 'rejected')->count(),
             
             // Bài viết
-            'published_articles' => Article::where('is_approved', true)->count(),
-            'draft_articles' => Article::where('is_approved', false)->count(),
+            'published_articles' => News::where('is_approved', true)->count(),
+            'draft_articles' => News::where('is_approved', false)->count(),
         ];
 
         return response()->json($metrics);
@@ -181,10 +181,10 @@ class DashboardController extends Controller
             'total_orders' => Order::count(),
             'total_products' => Product::count(),
             'total_reviews' => DB::table('reviews')->count(),
-            'total_articles' => Article::count(),
+            'total_articles' => News::count(),
             'total_revenue' => Order::sum('total_price'),
             'pending_reviews' => DB::table('reviews')->where('status', 'pending')->count(),
-            'pending_articles' => Article::where('is_approved', false)->count(),
+            'pending_articles' => News::where('is_approved', false)->count(),
         ];
 
         return response()->json($stats);

@@ -25,7 +25,7 @@ class VoucherController extends Controller
      */
     public function apiIndex(Request $request)
     {
-        $vouchers = \App\Models\Voucher::with('usages')->orderBy('createdAt', 'desc')->paginate(20);
+        $vouchers = \App\Models\Voucher::orderBy('created_at', 'desc')->paginate(20);
         
         // Thêm thông tin số lượng đã sử dụng cho mỗi voucher
         $vouchers->getCollection()->transform(function ($voucher) {

@@ -55,7 +55,7 @@ class UserController extends Controller
         }
 
         $perPage = $request->get('limit', 20);
-        $users = $query->orderBy('createdAt', 'desc')->paginate($perPage);
+        $users = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
         return response()->json([
             'data' => $users->items(),

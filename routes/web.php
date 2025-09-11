@@ -7,7 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\VoucherController;
-use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\UserController;
 
 // Dashboard routes
@@ -55,8 +55,12 @@ Route::prefix('api')->group(function () {
     // Vouchers
     Route::apiResource('vouchers', VoucherController::class);
     
-    // Articles
-    Route::apiResource('articles', ArticleController::class);
+    // News
+    Route::get('/news', [NewsController::class, 'apiIndex']);
+    Route::post('/news', [NewsController::class, 'store']);
+    Route::get('/news/{news}', [NewsController::class, 'show']);
+    Route::put('/news/{news}', [NewsController::class, 'update']);
+    Route::delete('/news/{news}', [NewsController::class, 'destroy']);
 });
 
 // Admin panel routes
@@ -104,14 +108,18 @@ Route::prefix('admin')->group(function () {
     Route::put('/vouchers/{voucher}', [VoucherController::class, 'update'])->name('admin.vouchers.update');
     Route::delete('/vouchers/{voucher}', [VoucherController::class, 'destroy'])->name('admin.vouchers.destroy');
     
-    // Articles
-    Route::get('/articles', [ArticleController::class, 'index'])->name('admin.articles.index');
-    Route::get('/articles/create', [ArticleController::class, 'create'])->name('admin.articles.create');
-    Route::post('/articles', [ArticleController::class, 'store'])->name('admin.articles.store');
-    Route::get('/articles/{article}', [ArticleController::class, 'show'])->name('admin.articles.show');
-    Route::get('/articles/{article}/edit', [ArticleController::class, 'edit'])->name('admin.articles.edit');
-    Route::put('/articles/{article}', [ArticleController::class, 'update'])->name('admin.articles.update');
-    Route::delete('/articles/{article}', [ArticleController::class, 'destroy'])->name('admin.articles.destroy');
+    // News
+    Route::get('/news', [NewsController::class, 'index'])->name('admin.news.index');
+    Route::get('/news/create', [NewsController::class, 'create'])->name('admin.news.create');
+    Route::post('/news', [NewsController::class, 'store'])->name('admin.news.store');
+    Route::get('/news/{news}', [NewsController::class, 'show'])->name('admin.news.show');
+    Route::get('/news/{news}/edit', [NewsController::class, 'edit'])->name('admin.news.edit');
+    Route::put('/news/{news}', [NewsController::class, 'update'])->name('admin.news.update');
+    Route::delete('/news/{news}', [NewsController::class, 'destroy'])->name('admin.news.destroy');
+    Route::post('/news/{news}/approve', [NewsController::class, 'approve'])->name('admin.news.approve');
+    Route::post('/news/{news}/reject', [NewsController::class, 'reject'])->name('admin.news.reject');
+    Route::post('/news/{news}/publish', [NewsController::class, 'publish'])->name('admin.news.publish');
+    Route::post('/news/{news}/unpublish', [NewsController::class, 'unpublish'])->name('admin.news.unpublish');
     
     // Users
     Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');

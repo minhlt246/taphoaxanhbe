@@ -34,12 +34,12 @@ class User extends Authenticatable
     /**
      * The name of the "created at" column.
      */
-    const CREATED_AT = 'createdAt';
+    const CREATED_AT = 'created_at';
 
     /**
      * The name of the "updated at" column.
      */
-    const UPDATED_AT = 'updatedAt';
+    const UPDATED_AT = 'updated_at';
 
     /**
      * The attributes that should be hidden for serialization.
