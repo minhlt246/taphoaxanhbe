@@ -309,7 +309,7 @@
                                 style: 'currency',
                                 currency: 'VND'
                             }).format(parseFloat(order.total_price))}</div>
-                            <small class="text-muted">${new Date(order.createdAt).toLocaleDateString('vi-VN')}</small>
+                            <small class="text-muted">${new Date(order.created_at).toLocaleDateString('vi-VN')}</small>
                         </div>
                     </div>
                 `).join('');

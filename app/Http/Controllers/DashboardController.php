@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\Review;
 use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -39,33 +38,33 @@ class DashboardController extends Controller
             'total_orders' => Order::count(),
             'total_revenue' => Order::sum('total_price'),
             'total_products' => Product::count(),
-            'total_reviews' => Review::count(),
+            'total_reviews' => DB::table('reviews')->count(),
             'total_articles' => Article::count(),
             
             // Hôm nay
-            'today_orders' => Order::whereDate('createdAt', $today)->count(),
-            'today_revenue' => Order::whereDate('createdAt', $today)->sum('total_price'),
-            'today_users' => User::whereDate('createdAt', $today)->count(),
+            'today_orders' => Order::whereDate('created_at', $today)->count(),
+            'today_revenue' => Order::whereDate('created_at', $today)->sum('total_price'),
+            'today_users' => User::whereDate('created_at', $today)->count(),
             
             // Hôm qua
-            'yesterday_orders' => Order::whereDate('createdAt', $yesterday)->count(),
-            'yesterday_revenue' => Order::whereDate('createdAt', $yesterday)->sum('total_price'),
+            'yesterday_orders' => Order::whereDate('created_at', $yesterday)->count(),
+            'yesterday_revenue' => Order::whereDate('created_at', $yesterday)->sum('total_price'),
             
             // Tuần này
-            'this_week_orders' => Order::where('createdAt', '>=', $thisWeek)->count(),
-            'this_week_revenue' => Order::where('createdAt', '>=', $thisWeek)->sum('total_price'),
+            'this_week_orders' => Order::where('created_at', '>=', $thisWeek)->count(),
+            'this_week_revenue' => Order::where('created_at', '>=', $thisWeek)->sum('total_price'),
             
             // Tuần trước
-            'last_week_orders' => Order::whereBetween('createdAt', [$lastWeek, $thisWeek])->count(),
-            'last_week_revenue' => Order::whereBetween('createdAt', [$lastWeek, $thisWeek])->sum('total_price'),
+            'last_week_orders' => Order::whereBetween('created_at', [$lastWeek, $thisWeek])->count(),
+            'last_week_revenue' => Order::whereBetween('created_at', [$lastWeek, $thisWeek])->sum('total_price'),
             
             // Tháng này
-            'this_month_orders' => Order::where('createdAt', '>=', $thisMonth)->count(),
-            'this_month_revenue' => Order::where('createdAt', '>=', $thisMonth)->sum('total_price'),
+            'this_month_orders' => Order::where('created_at', '>=', $thisMonth)->count(),
+            'this_month_revenue' => Order::where('created_at', '>=', $thisMonth)->sum('total_price'),
             
             // Tháng trước
-            'last_month_orders' => Order::whereBetween('createdAt', [$lastMonth, $thisMonth])->count(),
-            'last_month_revenue' => Order::whereBetween('createdAt', [$lastMonth, $thisMonth])->sum('total_price'),
+            'last_month_orders' => Order::whereBetween('created_at', [$lastMonth, $thisMonth])->count(),
+            'last_month_revenue' => Order::whereBetween('created_at', [$lastMonth, $thisMonth])->sum('total_price'),
             
             // Trạng thái đơn hàng
             'pending_orders' => Order::where('status', 'pending')->count(),
@@ -74,9 +73,9 @@ class DashboardController extends Controller
             'cancelled_orders' => Order::where('status', 'cancelled')->count(),
             
             // Đánh giá
-            'pending_reviews' => Review::where('status', 'pending')->count(),
-            'approved_reviews' => Review::where('status', 'approved')->count(),
-            'rejected_reviews' => Review::where('status', 'rejected')->count(),
+            'pending_reviews' => DB::table('reviews')->where('status', 'pending')->count(),
+            'approved_reviews' => DB::table('reviews')->where('status', 'approved')->count(),
+            'rejected_reviews' => DB::table('reviews')->where('status', 'rejected')->count(),
             
             // Bài viết
             'published_articles' => Article::where('is_approved', true)->count(),
@@ -93,12 +92,12 @@ class DashboardController extends Controller
     {
         $revenue = [
             'total' => Order::sum('total_price'),
-            'today' => Order::whereDate('createdAt', today())->sum('total_price'),
-            'yesterday' => Order::whereDate('createdAt', today()->subDay())->sum('total_price'),
-            'this_week' => Order::whereBetween('createdAt', [now()->startOfWeek(), now()->endOfWeek()])->sum('total_price'),
-            'last_week' => Order::whereBetween('createdAt', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])->sum('total_price'),
-            'this_month' => Order::whereMonth('createdAt', now()->month)->sum('total_price'),
-            'last_month' => Order::whereMonth('createdAt', now()->subMonth()->month)->sum('total_price'),
+            'today' => Order::whereDate('created_at', today())->sum('total_price'),
+            'yesterday' => Order::whereDate('created_at', today()->subDay())->sum('total_price'),
+            'this_week' => Order::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->sum('total_price'),
+            'last_week' => Order::whereBetween('created_at', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])->sum('total_price'),
+            'this_month' => Order::whereMonth('created_at', now()->month)->sum('total_price'),
+            'last_month' => Order::whereMonth('created_at', now()->subMonth()->month)->sum('total_price'),
         ];
 
         return response()->json($revenue);
@@ -110,10 +109,10 @@ class DashboardController extends Controller
     public function dailyRevenue(): JsonResponse
     {
         $dailyRevenue = Order::select(
-            DB::raw('DATE(createdAt) as date'),
+            DB::raw('DATE(created_at) as date'),
             DB::raw('SUM(total_price) as revenue')
         )
-        ->where('createdAt', '>=', now()->subDays(30))
+        ->where('created_at', '>=', now()->subDays(30))
         ->groupBy('date')
         ->orderBy('date')
         ->get();
@@ -127,11 +126,11 @@ class DashboardController extends Controller
     public function weeklyRevenue(): JsonResponse
     {
         $weeklyRevenue = Order::select(
-            DB::raw('WEEK(createdAt) as week'),
-            DB::raw('YEAR(createdAt) as year'),
+            DB::raw('WEEK(created_at) as week'),
+            DB::raw('YEAR(created_at) as year'),
             DB::raw('SUM(total_price) as revenue')
         )
-        ->where('createdAt', '>=', now()->subWeeks(12))
+        ->where('created_at', '>=', now()->subWeeks(12))
         ->groupBy('year', 'week')
         ->orderBy('year')
         ->orderBy('week')
@@ -146,11 +145,11 @@ class DashboardController extends Controller
     public function monthlyRevenue(): JsonResponse
     {
         $monthlyRevenue = Order::select(
-            DB::raw('MONTH(createdAt) as month'),
-            DB::raw('YEAR(createdAt) as year'),
+            DB::raw('MONTH(created_at) as month'),
+            DB::raw('YEAR(created_at) as year'),
             DB::raw('SUM(total_price) as revenue')
         )
-        ->where('createdAt', '>=', now()->subMonths(12))
+        ->where('created_at', '>=', now()->subMonths(12))
         ->groupBy('year', 'month')
         ->orderBy('year')
         ->orderBy('month')
@@ -165,7 +164,7 @@ class DashboardController extends Controller
     public function recentOrders(): JsonResponse
     {
         $recentOrders = Order::with('user')
-            ->orderBy('createdAt', 'desc')
+            ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
 
@@ -181,10 +180,10 @@ class DashboardController extends Controller
             'total_users' => User::count(),
             'total_orders' => Order::count(),
             'total_products' => Product::count(),
-            'total_reviews' => Review::count(),
+            'total_reviews' => DB::table('reviews')->count(),
             'total_articles' => Article::count(),
             'total_revenue' => Order::sum('total_price'),
-            'pending_reviews' => Review::where('status', 'pending')->count(),
+            'pending_reviews' => DB::table('reviews')->where('status', 'pending')->count(),
             'pending_articles' => Article::where('is_approved', false)->count(),
         ];
 
@@ -219,10 +218,10 @@ class DashboardController extends Controller
     public function userGrowth(): JsonResponse
     {
         $userGrowth = User::select(
-            DB::raw('DATE(createdAt) as date'),
+            DB::raw('DATE(created_at) as date'),
             DB::raw('COUNT(*) as new_users')
         )
-        ->where('createdAt', '>=', now()->subDays(30))
+        ->where('created_at', '>=', now()->subDays(30))
         ->groupBy('date')
         ->orderBy('date')
         ->get();
@@ -255,12 +254,12 @@ class DashboardController extends Controller
         $lastMonth = now()->subMonth()->month;
         $lastYear = now()->subMonth()->year;
 
-        $currentMonthSales = Order::whereMonth('createdAt', $currentMonth)
-            ->whereYear('createdAt', $currentYear)
+        $currentMonthSales = Order::whereMonth('created_at', $currentMonth)
+            ->whereYear('created_at', $currentYear)
             ->sum('total_price');
 
-        $lastMonthSales = Order::whereMonth('createdAt', $lastMonth)
-            ->whereYear('createdAt', $lastYear)
+        $lastMonthSales = Order::whereMonth('created_at', $lastMonth)
+            ->whereYear('created_at', $lastYear)
             ->sum('total_price');
 
         $growthRate = $lastMonthSales > 0 
@@ -281,8 +280,8 @@ class DashboardController extends Controller
     public function averageOrderValue(): JsonResponse
     {
         $avgOrderValue = Order::avg('total_price');
-        $avgOrderValueToday = Order::whereDate('createdAt', today())->avg('total_price');
-        $avgOrderValueThisMonth = Order::whereMonth('createdAt', now()->month)->avg('total_price');
+        $avgOrderValueToday = Order::whereDate('created_at', today())->avg('total_price');
+        $avgOrderValueThisMonth = Order::whereMonth('created_at', now()->month)->avg('total_price');
 
         return response()->json([
             'overall' => round($avgOrderValue, 2),
@@ -342,10 +341,10 @@ class DashboardController extends Controller
         
         // Lấy 7 ngày gần nhất có dữ liệu đơn hàng
         $recentOrders = Order::select(
-            DB::raw('DATE(createdAt) as date'),
+            DB::raw('DATE(created_at) as date'),
             DB::raw('SUM(total_price) as revenue')
         )
-        ->where('createdAt', '>=', now()->subDays(30)) // Lấy 30 ngày gần nhất để có đủ dữ liệu
+        ->where('created_at', '>=', now()->subDays(30)) // Lấy 30 ngày gần nhất để có đủ dữ liệu
         ->groupBy('date')
         ->orderBy('date', 'desc')
         ->limit(7)
@@ -354,10 +353,10 @@ class DashboardController extends Controller
         // Nếu không đủ 7 ngày, lấy các ngày gần nhất
         if ($recentOrders->count() < 7) {
             $recentOrders = Order::select(
-                DB::raw('DATE(createdAt) as date'),
+                DB::raw('DATE(created_at) as date'),
                 DB::raw('SUM(total_price) as revenue')
             )
-            ->where('createdAt', '>=', now()->subDays(60)) // Mở rộng lên 60 ngày
+            ->where('created_at', '>=', now()->subDays(60)) // Mở rộng lên 60 ngày
             ->groupBy('date')
             ->orderBy('date', 'desc')
             ->limit(7)
@@ -396,7 +395,7 @@ class DashboardController extends Controller
                 $weekEnd = $endOfMonth;
             }
             
-            $revenue = Order::whereBetween('createdAt', [$currentWeek, $weekEnd])->sum('total_price');
+            $revenue = Order::whereBetween('created_at', [$currentWeek, $weekEnd])->sum('total_price');
             
             $data[] = [
                 'label' => 'Tuần ' . $currentWeek->format('W') . ' (' . $currentWeek->format('d/m') . ' - ' . $weekEnd->format('d/m') . ')',
@@ -426,7 +425,7 @@ class DashboardController extends Controller
             $startOfMonth = $month->copy()->startOfMonth();
             $endOfMonth = $month->copy()->endOfMonth();
             
-            $revenue = Order::whereBetween('createdAt', [$startOfMonth, $endOfMonth])->sum('total_price');
+            $revenue = Order::whereBetween('created_at', [$startOfMonth, $endOfMonth])->sum('total_price');
             
             // Calculate percentage change compared to previous month
             $percentageChange = null;
