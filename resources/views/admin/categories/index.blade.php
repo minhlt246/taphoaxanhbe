@@ -65,7 +65,7 @@
                             <td>${category.id}</td>
                             <td>${category.name}</td>
                             <td>${category.slug || 'Không có slug'}</td>
-                            <td>${category.createdAt ? new Date(category.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</td>
+                            <td>${category.created_at ? new Date(category.created_at).toLocaleDateString('vi-VN') : 'N/A'}</td>
                             <td>
                                 <a href="/admin/categories/${category.id}" class="btn btn-sm btn-info">
                                     <i class="fas fa-eye"></i>

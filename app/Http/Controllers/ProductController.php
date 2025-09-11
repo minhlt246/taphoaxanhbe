@@ -23,7 +23,7 @@ class ProductController extends Controller
         
         // Get products for the view
         $products = Product::with(['category'])
-            ->orderBy('createdAt', 'desc')
+            ->orderBy('created_at', 'desc')
             ->paginate(20);
         
         // Get total statistics for all products (not just paginated)
@@ -68,7 +68,7 @@ class ProductController extends Controller
         }
 
         $perPage = $request->get('limit', 20);
-        $products = $query->orderBy('createdAt', 'desc')->paginate($perPage);
+        $products = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
         return response()->json([
             'products' => $products->items(),
@@ -251,9 +251,11 @@ class ProductController extends Controller
     public function stats(): JsonResponse
     {
         $stats = [
-            'total_products' => Product::count(),
-            'active_products' => Product::where('status', 'active')->count(),
-            'inactive_products' => Product::where('status', 'inactive')->count(),
+            'total' => Product::count(),
+            'active' => Product::where('status', 'active')->count(),
+            'inactive' => Product::where('status', 'inactive')->count(),
+            'in_stock' => Product::where('quantity', '>', 0)->count(),
+            'out_of_stock' => Product::where('quantity', '=', 0)->count(),
             'total_stock' => Product::sum('quantity'),
             'average_rating' => Product::avg('avg_rating'),
         ];

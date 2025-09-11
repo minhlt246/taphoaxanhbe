@@ -127,47 +127,98 @@
         </div>
     </div>
 
-    <!-- Stats Cards -->
+    <!-- Statistics Cards -->
     <div class="row mb-4">
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stats-card">
-                <div class="stats-number">{{ $totalProducts }}</div>
-                <div class="stats-label">Tổng sản phẩm</div>
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Tổng sản phẩm
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-products">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-box fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                <div class="stats-number">{{ $inStockProducts }}</div>
-                <div class="stats-label">Còn hàng</div>
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Còn hàng
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="in-stock-products">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                <div class="stats-number">{{ $outOfStockProducts }}</div>
-                <div class="stats-label">Hết hàng</div>
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Hết hàng
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="out-of-stock-products">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stats-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                <div class="stats-number">{{ $activeProducts }}</div>
-                <div class="stats-label">Đang hoạt động</div>
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Đang hoạt động
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="active-products">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-play-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Products Table -->
-    <div class="card product-table">
-        <div class="card-header text-black d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold">
-                <i class="fas fa-box me-2"></i>Danh sách sản phẩm
-            </h6>
-            
+    <div class="card shadow mb-4 product-table">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Danh sách sản phẩm</h6>
+            <div class="d-flex gap-2 align-items-center">
+                <label class="form-label mb-0 me-2">Lọc theo trạng thái:</label>
+                <select class="form-select form-select-sm" id="statusFilter" onchange="filterByStatus()" style="width: 150px;">
+                    <option value="">Tất cả</option>
+                    <option value="active">Hoạt động</option>
+                    <option value="inactive">Tạm dừng</option>
+                </select>
+            </div>
         </div>
-        <div class="card-body p-0">
-            @if($products->count() > 0)
+        <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-dark">
+                <table class="table table-striped">
+                    <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Tên sản phẩm</th>
@@ -175,120 +226,31 @@
                                 <th>Số lượng</th>
                                 <th>Trạng thái</th>
                                 <th>Ngày tạo</th>
-                                <th>Thao tác</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach($products as $product)
-                                <tr>
-                                    <td>{{ $product->id }}</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            @if($product->images)
-                                                @php
-                                                    $images = json_decode($product->images, true);
-                                                @endphp
-                                                @if(is_array($images) && count($images) > 0)
-                                                    <img src="{{ asset('images/product/' . $images[0]) }}" 
-                                                         alt="{{ $product->name }}" 
-                                                         class="me-2 product-image" 
-                                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;"
-                                                         onerror="this.src='{{ asset('images/product/default.jpg') }}'">
-                                                @else
-                                                    <img src="{{ asset('images/product/default.jpg') }}" 
-                                                         alt="{{ $product->name }}" 
-                                                         class="me-2 product-image" 
-                                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
-                                                @endif
-                                            @else
-                                                <img src="{{ asset('images/product/default.jpg') }}" 
-                                                     alt="{{ $product->name }}" 
-                                                     class="me-2 product-image" 
-                                                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
-                                            @endif
-                                            <div>
-                                                <strong>{{ $product->name }}</strong>
-                                                @if($product->category)
-                                                    <br><small class="text-muted">{{ $product->category->name }}</small>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <strong class="text-primary">{{ number_format($product->price, 0, ',', '.') }}đ</strong>
-                                        @if($product->discount > 0)
-                                            <br><small class="text-success">Giảm: {{ number_format($product->discount, 0, ',', '.') }}đ</small>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <span class="fs-6 me-2">
-                                                <i class="fas fa-box me-1"></i>{{ number_format($product->quantity) }}
-                                            </span>
-                                            <span class="text-muted">
-                                                / {{ number_format($product->totalQuantity) }}
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-{{ $product->quantity > 0 ? 'success' : 'warning' }} fs-6">
-                                            <i class="fas fa-{{ $product->quantity > 0 ? 'check-circle' : 'times-circle' }} me-1"></i>
-                                            {{ $product->quantity > 0 ? 'Còn hàng' : 'Hết hàng' }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <small class="text-muted">
-                                            <i class="fas fa-calendar-alt me-1"></i>
-                                            {{ $product->createdAt ? \Carbon\Carbon::parse($product->createdAt)->format('d/m/Y H:i') : 'N/A' }}
-                                        </small>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <a href="{{ route('admin.products.show', $product) }}" 
-                                               class="btn btn-sm btn-outline-info" 
-                                               title="Xem chi tiết">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="{{ route('admin.products.edit', $product) }}" 
-                                               class="btn btn-sm btn-outline-warning" 
-                                               title="Chỉnh sửa">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <button type="button" 
-                                                    class="btn btn-sm btn-outline-danger" 
-                                                    title="Xóa"
-                                                    onclick="deleteProduct({{ $product->id }})">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                    <tbody id="products-table">
+                        <tr>
+                            <td colspan="6" class="text-center"> 
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
                         </tbody>
                     </table>
                 </div>
                 
                 <!-- Pagination -->
-                <div class="d-flex justify-content-between align-items-center mt-4 p-3 bg-light rounded">
+            <div id="pagination-container" class="d-flex justify-content-between align-items-center mt-3" style="display: none !important;">
                     <div class="text-muted">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Hiển thị <strong>{{ $products->firstItem() }}</strong> đến <strong>{{ $products->lastItem() }}</strong> 
-                        trong tổng số <strong class="text-primary">{{ $products->total() }}</strong> sản phẩm
-                    </div>
-                    <div class="pagination-wrapper">
-                        {{ $products->appends(request()->query())->links('pagination::bootstrap-4') }}
-                    </div>
+                    Hiển thị <span id="showing-info">0</span> trong tổng số <span id="total-info">0</span> sản phẩm
                 </div>
-            @else
-                <div class="text-center py-5">
-                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-                    <h5 class="text-muted">Chưa có sản phẩm nào</h5>
-                    <p class="text-muted">Hãy thêm sản phẩm đầu tiên của bạn</p>
-                    <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Thêm sản phẩm đầu tiên
-                    </a>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0" id="pagination-links">
+                        <!-- Pagination links will be generated here -->
+                    </ul>
+                </nav>
                 </div>
-            @endif
         </div>
     </div>
 </div>
@@ -296,6 +258,170 @@
 
 @push('scripts')
 <script>
+    let allProducts = []; // Lưu trữ tất cả sản phẩm
+    let currentPage = 1;
+    let totalPages = 1;
+    let totalProducts = 0;
+    const productsPerPage = 20;
+    
+    // Fetch products data with pagination
+    async function fetchProducts(page = 1) {
+        try {
+            const statusFilter = document.getElementById('statusFilter').value;
+            let url = `/api/products?page=${page}&limit=${productsPerPage}`;
+            if (statusFilter) {
+                url += `&status=${statusFilter}`;
+            }
+            
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            // Lưu trữ dữ liệu gốc
+            allProducts = data.products || [];
+            currentPage = data.pagination.page || 1;
+            totalPages = data.pagination.totalPages || 1;
+            totalProducts = data.pagination.total || 0;
+            
+            const tbody = document.getElementById('products-table');
+            if (allProducts.length > 0) {
+                tbody.innerHTML = allProducts.map(product => `
+                    <tr>
+                        <td>${product.id}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                ${getProductImage(product)}
+                                <div>
+                                    <div class="fw-bold">${product.name}</div>
+                                    <small class="text-muted">${product.category?.name || 'Không có danh mục'}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-primary">${parseFloat(product.price).toLocaleString()} ₫</div>
+                            ${product.discount > 0 ? `<small class="text-success">Giảm ${product.discount}%</small>` : ''}
+                        </td>
+                        <td>
+                            <span class="badge ${product.quantity > 0 ? 'bg-success' : 'bg-danger'}">
+                                ${product.quantity}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge ${product.status === 'active' ? 'bg-success' : 'bg-secondary'}">
+                                ${product.status === 'active' ? 'Hoạt động' : 'Tạm dừng'}
+                            </span>
+                        </td>
+                        <td>${product.created_at ? new Date(product.created_at).toLocaleDateString('vi-VN') : 'N/A'}</td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Chưa có sản phẩm nào</td></tr>';
+            }
+            
+            updatePagination();
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            document.getElementById('products-table').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
+        }
+    }
+
+    // Get product image HTML
+    function getProductImage(product) {
+        if (product.images) {
+            try {
+                const images = JSON.parse(product.images);
+                if (Array.isArray(images) && images.length > 0) {
+                    return `<img src="/images/product/${images[0]}" 
+                                 alt="${product.name}" 
+                                 class="me-2 product-image" 
+                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;"
+                                 onerror="this.src='/images/product/default.jpg'">`;
+                }
+            } catch (e) {
+                console.error('Error parsing product images:', e);
+            }
+        }
+        return `<img src="/images/product/default.jpg" 
+                     alt="${product.name}" 
+                     class="me-2 product-image" 
+                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">`;
+    }
+
+    // Update pagination UI
+    function updatePagination() {
+        const container = document.getElementById('pagination-container');
+        const showingInfo = document.getElementById('showing-info');
+        const totalInfo = document.getElementById('total-info');
+        const paginationLinks = document.getElementById('pagination-links');
+        
+        if (totalPages <= 1) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        container.style.display = 'flex';
+        showingInfo.textContent = allProducts.length;
+        totalInfo.textContent = totalProducts;
+        
+        let paginationHTML = '';
+        
+        // Previous button
+        if (currentPage > 1) {
+            paginationHTML += `<li class="page-item">
+                <a class="page-link" href="#" onclick="fetchProducts(${currentPage - 1})">Trước</a>
+            </li>`;
+        } else {
+            paginationHTML += `<li class="page-item disabled">
+                <span class="page-link">Trước</span>
+            </li>`;
+        }
+        
+        // Page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === currentPage) {
+                paginationHTML += `<li class="page-item active">
+                    <span class="page-link">${i}</span>
+                </li>`;
+            } else {
+                paginationHTML += `<li class="page-item">
+                    <a class="page-link" href="#" onclick="fetchProducts(${i})">${i}</a>
+                </li>`;
+            }
+        }
+        
+        // Next button
+        if (currentPage < totalPages) {
+            paginationHTML += `<li class="page-item">
+                <a class="page-link" href="#" onclick="fetchProducts(${currentPage + 1})">Sau</a>
+            </li>`;
+        } else {
+            paginationHTML += `<li class="page-item disabled">
+                <span class="page-link">Sau</span>
+            </li>`;
+        }
+        
+        paginationLinks.innerHTML = paginationHTML;
+    }
+
+    // Filter by status
+    function filterByStatus() {
+        fetchProducts(1); // Reset về trang đầu khi filter
+    }
+
+    // Load statistics
+    async function loadStatistics() {
+        try {
+            const response = await fetch('/api/products-statistics');
+            const data = await response.json();
+            
+            document.getElementById('total-products').textContent = data.total || 0;
+            document.getElementById('in-stock-products').textContent = data.in_stock || 0;
+            document.getElementById('out-of-stock-products').textContent = data.out_of_stock || 0;
+            document.getElementById('active-products').textContent = data.active || 0;
+        } catch (error) {
+            console.error('Error loading statistics:', error);
+        }
+    }
+
     // Delete product
     async function deleteProduct(id) {
         if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
@@ -309,7 +435,8 @@
                 });
                 
                 if (response.ok) {
-                    location.reload(); // Reload the page
+                    fetchProducts(currentPage); // Reload current page
+                    loadStatistics(); // Reload statistics
                 } else {
                     alert('Có lỗi xảy ra khi xóa sản phẩm');
                 }
@@ -319,5 +446,11 @@
             }
         }
     }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchProducts();
+        loadStatistics();
+    });
 </script>
 @endpush

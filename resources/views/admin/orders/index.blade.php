@@ -204,11 +204,11 @@
                                 </span>
                             </td>
                             <td>
-                                <span class="badge ${getPaymentBadgeClass(order.payment_status)}">
-                                    ${getPaymentText(order.payment_status)}
+                                <span class="badge ${getPaymentBadgeClass(order.payment)}">
+                                    ${getPaymentText(order.payment)}
                                 </span>
                             </td>
-                            <td>${order.createdAt ? new Date(order.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</td>
+                            <td>${order.created_at ? new Date(order.created_at).toLocaleDateString('vi-VN') : 'N/A'}</td>
                         </tr>
                     `).join('');
                 } else {

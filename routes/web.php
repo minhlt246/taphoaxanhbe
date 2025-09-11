@@ -27,7 +27,7 @@ Route::prefix('api')->group(function () {
     
     // Products
     Route::apiResource('products', ProductController::class);
-    Route::get('/products/stats', [ProductController::class, 'stats']);
+    Route::get('/products-statistics', [ProductController::class, 'stats']);
     Route::get('/products/top-purchased', [ProductController::class, 'topPurchased']);
     
     // Categories

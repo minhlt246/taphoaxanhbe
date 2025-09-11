@@ -146,16 +146,6 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.dashboard') }}">
-                            <div class="nav-icon">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                    <path d="M1 12v-1h14v1H1zm0-2v-1h14v1H1zm0-2V7h14v1H1zm0-2V5h14v1H1zm0-2V3h14v1H1z"/>
-                                </svg>
-                            </div>
-                            <span class="nav-text">Lịch sử doanh thu</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}">
                             <div class="nav-icon">
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
