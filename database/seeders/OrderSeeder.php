@@ -43,14 +43,14 @@ class OrderSeeder extends Seeder
                 // Tạo đơn hàng
                 $orderCode = 'ORD' . $user->id . $orderCount . rand(1000, 9999); // Tạo order_code unique
                 $order = Order::create([
-                    'userId' => $user->id,
+                    'user_id' => $user->id,
                     'order_code' => $orderCode,
                     'total_price' => 0, // Sẽ cập nhật sau
                     'status' => 'completed',
-                    'payment_status' => 'completed',
+                    'payment' => 'paid',
                     'note' => 'Đơn hàng tự động tạo',
-                    'createdAt' => $orderDate,
-                    'updatedAt' => $orderDate,
+                    'created_at' => $orderDate,
+                    'updated_at' => $orderDate,
                 ]);
                 
                 // Tạo order items (1-5 sản phẩm mỗi đơn hàng)
@@ -73,9 +73,10 @@ class OrderSeeder extends Seeder
                         'order_id' => $order->id,
                         'product_id' => $product->id,
                         'quantity' => $quantity,
-                        'unit_price' => $price,
-                        'createdAt' => $orderDate,
-                        'updatedAt' => $orderDate,
+                        'price' => $price,
+                        'total_price' => $itemTotal,
+                        'created_at' => $orderDate,
+                        'updated_at' => $orderDate,
                     ]);
                     
                     // Cập nhật số lượng sản phẩm (đảm bảo không âm)
@@ -98,14 +99,14 @@ class OrderSeeder extends Seeder
                         // Nếu tổng quá thấp, tăng giá một số sản phẩm
                         $multiplier = $minTotal / $orderTotal;
                         $order->orderItems()->update([
-                            'unit_price' => \DB::raw("unit_price * $multiplier")
+                            'price' => \DB::raw("price * $multiplier")
                         ]);
                         $orderTotal = $minTotal;
                     } elseif ($orderTotal > $maxTotal) {
                         // Nếu tổng quá cao, giảm giá
                         $multiplier = $maxTotal / $orderTotal;
                         $order->orderItems()->update([
-                            'unit_price' => \DB::raw("unit_price * $multiplier")
+                            'price' => \DB::raw("price * $multiplier")
                         ]);
                         $orderTotal = $maxTotal;
                     }
@@ -119,9 +120,9 @@ class OrderSeeder extends Seeder
                         'order_id' => $order->id,
                         'product_id' => $randomProduct->id,
                         'quantity' => $quantity,
-                        'unit_price' => $price,
-                        'createdAt' => $orderDate,
-                        'updatedAt' => $orderDate,
+                        'price' => $price,
+                        'created_at' => $orderDate,
+                        'updated_at' => $orderDate,
                     ]);
                     
                     $orderTotal = $minTotal;
@@ -146,16 +147,16 @@ class OrderSeeder extends Seeder
                             $voucher->update(['is_used' => true]);
                         }
                         
-                        // Tạo voucher usage record
-                        \App\Models\VoucherUsage::create([
-                            'voucher_id' => $voucher->id,
-                            'user_id' => $user->id,
-                            'order_id' => $order->id,
-                            'discount_amount' => $discountAmount,
-                            'used_at' => $orderDate,
-                            'created_at' => $orderDate,
-                            'updated_at' => $orderDate,
-                        ]);
+                        // Tạo voucher usage record - Tạm thời comment vì không có bảng voucher_usage
+                        // \App\Models\VoucherUsage::create([
+                        //     'voucher_id' => $voucher->id,
+                        //     'user_id' => $user->id,
+                        //     'order_id' => $order->id,
+                        //     'discount_amount' => $discountAmount,
+                        //     'used_at' => $orderDate,
+                        //     'created_at' => $orderDate,
+                        //     'updated_at' => $orderDate,
+                        // ]);
                         
                         echo "Sử dụng voucher {$voucher->code} cho đơn hàng {$order->order_code}, giảm " . number_format($discountAmount) . " VNĐ\n";
                     }

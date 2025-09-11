@@ -11,20 +11,20 @@ class Order extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'order';
+    protected $table = 'orders';
 
     protected $fillable = [
         'total_price',
         'note',
         'order_code',
         'status',
-        'payment_status',
-        'userId',
+        'payment',
+        'user_id',
     ];
 
-    const CREATED_AT = 'createdAt';
-    const UPDATED_AT = 'updatedAt';
-    const DELETED_AT = 'deletedAt';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
+    const DELETED_AT = 'deleted_at';
 
     protected $casts = [
         'total_price' => 'decimal:2',

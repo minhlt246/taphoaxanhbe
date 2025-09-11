@@ -8,11 +8,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Voucher extends Model
 {
-    protected $table = 'voucher';
+    protected $table = 'vouchers';
     
-    const CREATED_AT = 'createdAt';
-    const UPDATED_AT = 'updatedAt';
-    const DELETED_AT = 'deletedAt';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
     
     protected $fillable = [
         'code',
@@ -70,7 +69,7 @@ class Voucher extends Model
      */
     public function getUsedCount(): int
     {
-        return $this->usages()->count();
+        return 0; // Tạm thời return 0 vì không có bảng voucher_usage
     }
 
     /**

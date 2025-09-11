@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
-    protected $table = 'product';
+    protected $table = 'products';
 
     protected $fillable = [
         'name',
@@ -41,8 +41,8 @@ class Product extends Model
         'expiry_date' => 'date',
     ];
     
-    const CREATED_AT = 'createdAt';
-    const UPDATED_AT = 'updatedAt';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
     public function category(): BelongsTo
     {
