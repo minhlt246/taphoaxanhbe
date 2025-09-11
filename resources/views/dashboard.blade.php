@@ -124,6 +124,37 @@
                     </div>
                 </div>
 
+                <!-- Revenue Overview -->
+                <div class="row mb-4">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold text-primary">Tổng quan doanh thu</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 text-center">
+                                        <h4 class="text-success" id="today-revenue">0 ₫</h4>
+                                        <small class="text-muted">Hôm nay</small>
+                                    </div>
+                                    <div class="col-md-3 text-center">
+                                        <h4 class="text-info" id="week-revenue">0 ₫</h4>
+                                        <small class="text-muted">Tuần này</small>
+                                    </div>
+                                    <div class="col-md-3 text-center">
+                                        <h4 class="text-warning" id="month-revenue">0 ₫</h4>
+                                        <small class="text-muted">Tháng này</small>
+                                    </div>
+                                    <div class="col-md-3 text-center">
+                                        <h4 class="text-primary" id="total-revenue-overview">0 ₫</h4>
+                                        <small class="text-muted">Tổng cộng</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Charts Row -->
                 <div class="row mb-4">
                     <div class="col-xl-8 col-lg-7">
@@ -150,37 +181,6 @@
                                         <div class="spinner-border" role="status">
                                             <span class="visually-hidden">Loading...</span>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Revenue Overview -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h6 class="m-0 font-weight-bold text-primary">Tổng quan doanh thu</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-3 text-center">
-                                        <h4 class="text-success" id="today-revenue">0 ₫</h4>
-                                        <small class="text-muted">Hôm nay</small>
-                                    </div>
-                                    <div class="col-md-3 text-center">
-                                        <h4 class="text-info" id="week-revenue">0 ₫</h4>
-                                        <small class="text-muted">Tuần này</small>
-                                    </div>
-                                    <div class="col-md-3 text-center">
-                                        <h4 class="text-warning" id="month-revenue">0 ₫</h4>
-                                        <small class="text-muted">Tháng này</small>
-                                    </div>
-                                    <div class="col-md-3 text-center">
-                                        <h4 class="text-primary" id="total-revenue-overview">0 ₫</h4>
-                                        <small class="text-muted">Tổng cộng</small>
                                     </div>
                                 </div>
                             </div>
