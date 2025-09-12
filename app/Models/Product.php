@@ -23,7 +23,7 @@ class Product extends Model
         'origin',
         'weight_unit',
         'quantity',
-        'totalQuantity',
+        'total_quantity',
         'purchase',
         'category_id',
         'brand_id',

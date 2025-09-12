@@ -70,8 +70,24 @@ class ProductController extends Controller
         $perPage = $request->get('limit', 20);
         $products = $query->orderBy('createdAt', 'desc')->paginate($perPage);
 
+        // Transform products to include total_quantity and calculate actual quantity
+        $transformedProducts = $products->items();
+        foreach ($transformedProducts as $product) {
+            if (!$product->total_quantity) {
+                $product->total_quantity = $product->quantity;
+            }
+            
+            // Calculate actual quantity (total - sold)
+            $soldQuantity = \DB::table('order_item')
+                ->where('product_id', $product->id)
+                ->sum('quantity');
+            
+            $product->actual_quantity = max(0, $product->total_quantity - $soldQuantity);
+            $product->sold_quantity = $soldQuantity;
+        }
+
         return response()->json([
-            'products' => $products->items(),
+            'products' => $transformedProducts,
             'pagination' => [
                 'page' => $products->currentPage(),
                 'limit' => $perPage,
@@ -126,7 +142,7 @@ class ProductController extends Controller
             'brand_id' => $request->brand_id,
             'images' => $request->images,
             'quantity' => $quantity,
-            'totalQuantity' => $quantity, // Set totalQuantity = quantity khi tạo mới
+            'total_quantity' => $quantity, // Set total_quantity = quantity khi tạo mới
             // 'status' => $request->status ?? 'active', // Bảng product không có cột status
             'slug' => Str::slug($request->name),
             'created_by' => Auth::id(),
@@ -250,14 +266,40 @@ class ProductController extends Controller
      */
     public function stats(): JsonResponse
     {
+        $products = Product::all();
+        $totalProducts = $products->count();
+        $activeProducts = 0;
+        $inactiveProducts = 0;
+        $inStockProducts = 0;
+        $outOfStockProducts = 0;
+        $totalStock = 0;
+        
+        foreach ($products as $product) {
+            // Calculate actual quantity (total - sold)
+            $soldQuantity = \DB::table('order_item')
+                ->where('product_id', $product->id)
+                ->sum('quantity');
+            
+            $actualQuantity = max(0, $product->total_quantity - $soldQuantity);
+            $totalStock += $actualQuantity;
+            
+            if ($actualQuantity > 0) {
+                $activeProducts++;
+                $inStockProducts++;
+            } else {
+                $inactiveProducts++;
+                $outOfStockProducts++;
+            }
+        }
+        
         $stats = [
-            'total' => Product::count(),
-            'active' => Product::where('quantity', '>', 0)->count(),
-            'inactive' => Product::where('quantity', '=', 0)->count(),
-            'in_stock' => Product::where('quantity', '>', 0)->count(),
-            'out_of_stock' => Product::where('quantity', '=', 0)->count(),
-            'total_stock' => Product::sum('quantity'),
-            'average_rating' => Product::avg('avg_rating'),
+            'total' => $totalProducts,
+            'active' => $activeProducts,
+            'inactive' => $inactiveProducts,
+            'in_stock' => $inStockProducts,
+            'out_of_stock' => $outOfStockProducts,
+            'total_stock' => $totalStock,
+            'average_rating' => 0, // Bảng product không có cột avg_rating
         ];
 
         return response()->json($stats);

@@ -58,11 +58,12 @@
                         <th>Ngày bắt đầu</th>
                         <th>Ngày kết thúc</th>
                         <th>Trạng thái</th>
+                        <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody id="vouchers-table">
                     <tr>
-                        <td colspan="9" class="text-center">
+                        <td colspan="10" class="text-center">
                             <div class="spinner-border" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
@@ -108,11 +109,11 @@
                         <td>${voucher.id}</td>
                         <td><code>${voucher.code}</code></td>
                         <td>
-                            <span class="badge ${voucher.type === 'PERCENTAGE' ? 'bg-info' : 'bg-primary'}">
-                                ${voucher.type === 'PERCENTAGE' ? 'Phần trăm' : 'Cố định'}
+                            <span class="badge ${voucher.type === 'discount' ? 'bg-primary' : 'bg-info'}">
+                                ${voucher.type === 'discount' ? 'Giảm giá' : 'Phần trăm'}
                             </span>
                         </td>
-                        <td>${voucher.type === 'PERCENTAGE' ? voucher.value + '%' : voucher.value.toLocaleString() + ' ₫'}</td>
+                        <td>${voucher.max_discount ? voucher.max_discount.toLocaleString() + ' ₫' : 'Không giới hạn'}</td>
                         <td>${voucher.quantity}</td>
                         <td>
                             <span class="badge ${voucher.used_count >= voucher.quantity ? 'bg-danger' : 'bg-info'}">
@@ -126,6 +127,19 @@
                                 ${getVoucherStatusText(voucher)}
                             </span>
                         </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="/admin/vouchers/${voucher.id}" class="btn btn-sm btn-info" title="Xem chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="/admin/vouchers/${voucher.id}/edit" class="btn btn-sm btn-warning" title="Chỉnh sửa">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button class="btn btn-sm btn-danger" onclick="deleteVoucher(${voucher.id})" title="Xóa">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                 `).join('');
                 
@@ -135,11 +149,11 @@
                 totalVouchers = data.pagination.total;
                 updatePagination();
             } else {
-                tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">Chưa có voucher nào</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">Chưa có voucher nào</td></tr>';
             }
         } catch (error) {
             console.error('Error fetching vouchers:', error);
-            document.getElementById('vouchers-table').innerHTML = '<tr><td colspan="9" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
+            document.getElementById('vouchers-table').innerHTML = '<tr><td colspan="10" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
         }
     }
 
@@ -258,6 +272,33 @@
             return 'Gần hết';
         } else {
             return 'Hoạt động';
+        }
+    }
+
+    // Delete voucher function
+    async function deleteVoucher(id) {
+        if (confirm('Bạn có chắc chắn muốn xóa voucher này?')) {
+            try {
+                const response = await fetch(`/api/vouchers/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    showAlert('success', result.message);
+                    fetchVouchers(currentPage); // Reload current page
+                } else {
+                    showAlert('error', result.message || 'Có lỗi xảy ra khi xóa voucher');
+                }
+            } catch (error) {
+                console.error('Error deleting voucher:', error);
+                showAlert('error', 'Có lỗi xảy ra khi xóa voucher');
+            }
         }
     }
 

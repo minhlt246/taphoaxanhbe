@@ -14,7 +14,7 @@ use App\Http\Controllers\UserController;
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
-// API routes for dashboard data
+// API routes
 Route::prefix('api')->group(function () {
     // Dashboard metrics
     Route::get('/metrics', [DashboardController::class, 'metrics']);
@@ -24,38 +24,45 @@ Route::prefix('api')->group(function () {
     Route::get('/monthly-revenue', [DashboardController::class, 'monthlyRevenue']);
     Route::get('/recent-orders', [DashboardController::class, 'recentOrders']);
     Route::get('/system-stats', [DashboardController::class, 'systemStats']);
+    Route::get('/revenue-chart', [DashboardController::class, 'revenueChart']);
+    Route::get('/top-selling-products', [DashboardController::class, 'topSellingProducts']);
+    Route::get('/user-growth', [DashboardController::class, 'userGrowth']);
+    Route::get('/order-status-distribution', [DashboardController::class, 'orderStatusDistribution']);
+    Route::get('/monthly-sales-comparison', [DashboardController::class, 'monthlySalesComparison']);
+    Route::get('/average-order-value', [DashboardController::class, 'averageOrderValue']);
+    Route::get('/conversion-rate', [DashboardController::class, 'conversionRate']);
     
-    // Products
+    // Products API
     Route::apiResource('products', ProductController::class);
     Route::get('/products-statistics', [ProductController::class, 'stats']);
     Route::get('/products/top-purchased', [ProductController::class, 'topPurchased']);
     
-    // Categories
+    // Categories API
     Route::apiResource('categories', CategoryController::class);
     
-    // Users
+    // Users API
     Route::apiResource('users', UserController::class);
-    Route::post('/users/update-activity', [UserController::class, 'updateActivity'])->name('admin.users.update-activity');
+    Route::post('/users/update-activity', [UserController::class, 'updateActivity']);
     
-    // Orders
+    // Orders API
     Route::apiResource('orders', OrderController::class);
     Route::get('/orders/{order}/approve', [OrderController::class, 'approve']);
     Route::get('/orders/{order}/reject', [OrderController::class, 'reject']);
     Route::get('/orders/{order}/shipped', [OrderController::class, 'markAsShipped']);
     Route::get('/orders/{order}/delivered', [OrderController::class, 'markAsDelivered']);
     Route::post('/orders/{order}/payment-status', [OrderController::class, 'updatePaymentStatus'])->withoutMiddleware(['web']);
-    Route::get('/orders/{order}/delete', [OrderController::class, 'destroy']);
     
-    // Reviews
+    // Reviews API
     Route::apiResource('reviews', ReviewController::class);
     Route::get('/reviews/{review}/approve', [ReviewController::class, 'approve']);
     Route::get('/reviews/{review}/reject', [ReviewController::class, 'reject']);
-    Route::get('/reviews/{review}/delete', [ReviewController::class, 'destroy']);
     
-    // Vouchers
+    // Vouchers API
     Route::apiResource('vouchers', VoucherController::class);
+    Route::post('/vouchers/use', [VoucherController::class, 'useVoucher'])->withoutMiddleware(['web']);
+    Route::post('/vouchers/check', [VoucherController::class, 'checkVoucher'])->withoutMiddleware(['web']);
     
-    // News
+    // News API
     Route::get('/news', [NewsController::class, 'apiIndex']);
     Route::post('/news', [NewsController::class, 'store']);
     Route::get('/news/{news}', [NewsController::class, 'show']);
@@ -129,30 +136,6 @@ Route::prefix('admin')->group(function () {
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
-});
-
-// API Routes for Dashboard Statistics
-Route::prefix('api')->group(function () {
-    Route::get('/metrics', [DashboardController::class, 'metrics']);
-    Route::get('/revenue-overview', [DashboardController::class, 'revenueOverview']);
-    Route::get('/revenue-chart', [DashboardController::class, 'revenueChart']);
-    Route::get('/daily-revenue', [DashboardController::class, 'dailyRevenue']);
-    Route::get('/weekly-revenue', [DashboardController::class, 'weeklyRevenue']);
-    Route::get('/monthly-revenue', [DashboardController::class, 'monthlyRevenue']);
-    Route::get('/recent-orders', [DashboardController::class, 'recentOrders']);
-    Route::get('/system-stats', [DashboardController::class, 'systemStats']);
-    Route::get('/top-selling-products', [DashboardController::class, 'topSellingProducts']);
-    Route::get('/user-growth', [DashboardController::class, 'userGrowth']);
-    Route::get('/order-status-distribution', [DashboardController::class, 'orderStatusDistribution']);
-    Route::get('/monthly-sales-comparison', [DashboardController::class, 'monthlySalesComparison']);
-    Route::get('/average-order-value', [DashboardController::class, 'averageOrderValue']);
-    Route::get('/conversion-rate', [DashboardController::class, 'conversionRate']);
-    
-    // Voucher API routes
-    Route::get('/vouchers', [VoucherController::class, 'apiIndex']);
-    Route::post('/vouchers/use', [VoucherController::class, 'useVoucher'])->withoutMiddleware(['web']);
-    Route::post('/vouchers/check', [VoucherController::class, 'checkVoucher'])->withoutMiddleware(['web']);
-    Route::delete('/vouchers/{voucher}', [VoucherController::class, 'destroy'])->withoutMiddleware(['web']);
 });
 
 Auth::routes();

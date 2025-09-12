@@ -21,7 +21,7 @@ class NewsController extends Controller
      */
     public function apiIndex(Request $request): JsonResponse
     {
-        $query = News::with('author')->orderBy('created_at', 'desc');
+        $query = News::orderBy('created_at', 'desc');
         
         // Filter by status if provided
         if ($request->has('status') && $request->status) {
@@ -209,5 +209,21 @@ class NewsController extends Controller
         ]);
 
         return response()->json(['success' => true, 'message' => 'Bài viết đã được gỡ xuất bản!']);
+    }
+
+    /**
+     * Get news statistics
+     */
+    public function stats(): JsonResponse
+    {
+        $stats = [
+            'total' => News::count(),
+            'published' => News::where('is_published', true)->where('is_approved', true)->count(),
+            'approved' => News::where('is_approved', true)->where('is_published', false)->count(),
+            'pending' => News::where('is_approved', false)->where('is_rejected', false)->count(),
+            'rejected' => News::where('is_rejected', true)->count(),
+        ];
+
+        return response()->json($stats);
     }
 }

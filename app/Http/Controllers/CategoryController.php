@@ -31,7 +31,7 @@ class CategoryController extends Controller
         // Loại bỏ danh mục "chưa có danh mục nào" (id = 0) khỏi danh sách
         $categories = Category::with('parent')
             ->where('id', '!=', 0)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('createdAt', 'desc')
             ->paginate(20);
         
         return response()->json([
@@ -145,13 +145,13 @@ class CategoryController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Danh mục đã được cập nhật thành công!',
+                'message' => 'Category đã được cập nhật thành công!',
                 'data' => $category
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Có lỗi xảy ra khi cập nhật danh mục: ' . $e->getMessage()
+                'message' => 'Có lỗi xảy ra khi cập nhật category: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -166,7 +166,7 @@ class CategoryController extends Controller
             if ($id == 0) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Không thể xóa danh mục mặc định!'
+                    'message' => 'Không thể xóa category mặc định!'
                 ], 400);
             }
 
@@ -180,12 +180,12 @@ class CategoryController extends Controller
             
             return response()->json([
                 'success' => true,
-                'message' => 'Danh mục đã được xóa thành công! Các sản phẩm trong danh mục này đã được chuyển về "Chưa có danh mục nào".'
+                'message' => 'Category đã được xóa thành công! Các sản phẩm trong category này đã được chuyển về "Chưa có category nào".'
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Có lỗi xảy ra khi xóa danh mục: ' . $e->getMessage()
+                'message' => 'Có lỗi xảy ra khi xóa category: ' . $e->getMessage()
             ], 500);
         }
     }

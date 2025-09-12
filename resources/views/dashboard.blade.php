@@ -14,13 +14,39 @@
     .metric-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
+        height: 120px;
+        display: flex;
+        align-items: center;
     }
     .metric-card .card-body {
-        padding: 2rem;
+        padding: 1.5rem;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .metric-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex: 1;
     }
     .metric-icon {
         font-size: 3rem;
         opacity: 0.8;
+        margin-left: 1rem;
+    }
+    .metric-text {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+    .metric-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0;
+        line-height: 1.2;
     }
     .chart-container {
         position: relative;
@@ -54,17 +80,11 @@
                     <div class="col-xl-3 col-md-6 mb-4">
                         <div class="card metric-card">
                             <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-uppercase mb-1">
-                                            Tổng khách hàng
-                                        </div>
-                                        <div class="h5 mb-0 font-weight-bold" id="total-users">0</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-users metric-icon"></i>
-                                    </div>
+                                <div class="metric-content">
+                                    <div class="metric-text">Tổng khách hàng</div>
+                                    <div class="metric-value" id="total-users">0</div>
                                 </div>
+                                <i class="fas fa-users metric-icon"></i>
                             </div>
                         </div>
                     </div>
@@ -72,17 +92,11 @@
                     <div class="col-xl-3 col-md-6 mb-4">
                         <div class="card metric-card">
                             <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-uppercase mb-1">
-                                            Tổng đơn hàng
-                                        </div>
-                                        <div class="h5 mb-0 font-weight-bold" id="total-orders">0</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-shopping-cart metric-icon"></i>
-                                    </div>
+                                <div class="metric-content">
+                                    <div class="metric-text">Tổng đơn hàng</div>
+                                    <div class="metric-value" id="total-orders">0</div>
                                 </div>
+                                <i class="fas fa-shopping-cart metric-icon"></i>
                             </div>
                         </div>
                     </div>
@@ -90,17 +104,11 @@
                     <div class="col-xl-3 col-md-6 mb-4">
                         <div class="card metric-card">
                             <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-uppercase mb-1">
-                                            Tổng doanh thu
-                                        </div>
-                                        <div class="h5 mb-0 font-weight-bold" id="total-revenue">0 ₫</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-dollar-sign metric-icon"></i>
-                                    </div>
+                                <div class="metric-content">
+                                    <div class="metric-text">Tổng doanh thu</div>
+                                    <div class="metric-value" id="total-revenue">0 ₫</div>
                                 </div>
+                                <i class="fas fa-dollar-sign metric-icon"></i>
                             </div>
                         </div>
                     </div>
@@ -108,17 +116,11 @@
                     <div class="col-xl-3 col-md-6 mb-4">
                         <div class="card metric-card">
                             <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-uppercase mb-1">
-                                            Sản phẩm
-                                        </div>
-                                        <div class="h5 mb-0 font-weight-bold" id="total-products">0</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-box metric-icon"></i>
-                                    </div>
+                                <div class="metric-content">
+                                    <div class="metric-text">Sản phẩm</div>
+                                    <div class="metric-value" id="total-products">0</div>
                                 </div>
+                                <i class="fas fa-box metric-icon"></i>
                             </div>
                         </div>
                     </div>
@@ -159,12 +161,32 @@
                 <div class="row mb-4">
                     <div class="col-xl-8 col-lg-7">
                         <div class="card">
-                            <div class="card-header">
-                                <h6 class="m-0 font-weight-bold text-primary">Doanh thu theo ngày</h6>
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 font-weight-bold text-primary">Biểu đồ doanh thu</h6>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center">
+                                        <label class="form-label mb-0 me-2">Chọn khoảng thời gian:</label>
+                                        <select class="form-select form-select-sm" id="chart-period" onchange="switchChart(this.value)" style="width: 150px;">
+                                            <option value="daily">Theo ngày trong tháng</option>
+                                            <option value="weekly">Theo tuần trong tháng</option>
+                                            <option value="monthly">So sánh các tháng</option>
+                                        </select>
+                                    </div>
+                                    <div class="d-flex align-items-center" id="month-selector">
+                                        <label class="form-label mb-0 me-2">Chọn tháng:</label>
+                                        <select class="form-select form-select-sm" id="chart-month" onchange="switchChart(currentChartType)" style="width: 150px;">
+                                            <option value="2025-05">Tháng 5/2025</option>
+                                            <option value="2025-06">Tháng 6/2025</option>
+                                            <option value="2025-07">Tháng 7/2025</option>
+                                            <option value="2025-08">Tháng 8/2025</option>
+                                            <option value="2025-09" selected>Tháng 9/2025</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="chart-container">
-                                    <canvas id="dailyRevenueChart"></canvas>
+                                    <canvas id="revenueChart"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -239,28 +261,148 @@
             }
         }
 
-        // Fetch daily revenue chart
-        async function fetchDailyRevenueChart() {
+        let revenueChart = null;
+        let currentChartType = 'daily';
+
+        // Fetch revenue chart data
+        async function fetchRevenueChart(type = 'daily') {
             try {
-                const response = await fetch('/api/daily-revenue');
+                let url = '';
+                
+                switch(type) {
+                    case 'daily':
+                        const selectedMonth = document.getElementById('chart-month').value;
+                        url = `/api/daily-revenue?month=${selectedMonth}`;
+                        break;
+                    case 'weekly':
+                        const selectedMonthWeekly = document.getElementById('chart-month').value;
+                        url = `/api/weekly-revenue?month=${selectedMonthWeekly}`;
+                        break;
+                    case 'monthly':
+                        url = '/api/monthly-revenue';
+                        break;
+                }
+                
+                const response = await fetch(url);
                 const data = await response.json();
                 
-                const ctx = document.getElementById('dailyRevenueChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
+                const ctx = document.getElementById('revenueChart').getContext('2d');
+                
+                // Destroy existing chart
+                if (revenueChart) {
+                    revenueChart.destroy();
+                }
+                
+                // Calculate percentage changes for daily data
+                let labels = data.map(item => item.date || item.label);
+                let chartData = data.map(item => item.revenue);
+                let backgroundColors = [];
+                
+                if (type === 'daily' && data.length > 1) {
+                    // Calculate percentage changes for daily revenue
+                    for (let i = 0; i < chartData.length; i++) {
+                        if (i === 0) {
+                            backgroundColors.push('rgba(102, 126, 234, 0.8)'); // First day - default color
+                        } else {
+                            const prevRevenue = chartData[i - 1];
+                            const currentRevenue = chartData[i];
+                            
+                            if (prevRevenue === 0) {
+                                backgroundColors.push('rgba(102, 126, 234, 0.8)'); // Default if previous is 0
+                            } else {
+                                const percentageChange = ((currentRevenue - prevRevenue) / prevRevenue) * 100;
+                                
+                                if (percentageChange > 0) {
+                                    backgroundColors.push('rgba(34, 197, 94, 0.8)'); // Green for increase
+                                } else if (percentageChange < 0) {
+                                    backgroundColors.push('rgba(239, 68, 68, 0.8)'); // Red for decrease
+                                } else {
+                                    backgroundColors.push('rgba(102, 126, 234, 0.8)'); // Default for no change
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // Default colors for weekly and monthly
+                    backgroundColors = data.map(() => 'rgba(102, 126, 234, 0.8)');
+                }
+
+                // Create new chart
+                revenueChart = new Chart(ctx, {
+                    type: 'bar',
                     data: {
-                        labels: data.map(item => item.date),
+                        labels: labels,
                         datasets: [{
                             label: 'Doanh thu (VND)',
-                            data: data.map(item => item.revenue),
-                            borderColor: 'rgb(75, 192, 192)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            tension: 0.1
+                            data: chartData,
+                            backgroundColor: backgroundColors,
+                            borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            borderSkipped: false,
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: type === 'daily',
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20,
+                                    generateLabels: function(chart) {
+                                        if (type === 'daily') {
+                                            return [
+                                                {
+                                                    text: 'Ngày đầu tiên',
+                                                    fillStyle: 'rgba(102, 126, 234, 0.8)',
+                                                    strokeStyle: 'rgba(102, 126, 234, 1)',
+                                                    lineWidth: 1,
+                                                    pointStyle: 'rect'
+                                                },
+                                                {
+                                                    text: 'Tăng so với ngày trước',
+                                                    fillStyle: 'rgba(34, 197, 94, 0.8)',
+                                                    strokeStyle: 'rgba(34, 197, 94, 1)',
+                                                    lineWidth: 1,
+                                                    pointStyle: 'rect'
+                                                },
+                                                {
+                                                    text: 'Giảm so với ngày trước',
+                                                    fillStyle: 'rgba(239, 68, 68, 0.8)',
+                                                    strokeStyle: 'rgba(239, 68, 68, 1)',
+                                                    lineWidth: 1,
+                                                    pointStyle: 'rect'
+                                                }
+                                            ];
+                                        }
+                                        return [];
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const value = context.parsed.y;
+                                        let tooltipText = 'Doanh thu: ' + new Intl.NumberFormat('vi-VN').format(value) + ' ₫';
+                                        
+                                        // Add percentage change for daily data
+                                        if (type === 'daily' && context.dataIndex > 0) {
+                                            const prevValue = chartData[context.dataIndex - 1];
+                                            if (prevValue > 0) {
+                                                const percentageChange = ((value - prevValue) / prevValue) * 100;
+                                                const changeText = percentageChange > 0 ? '+' : '';
+                                                tooltipText += ` (${changeText}${percentageChange.toFixed(1)}%)`;
+                                            }
+                                        }
+                                        
+                                        return tooltipText;
+                                    }
+                                }
+                            }
+                        },
                         scales: {
                             y: {
                                 beginAtZero: true,
@@ -268,7 +410,8 @@
                                     callback: function(value) {
                                         return new Intl.NumberFormat('vi-VN', {
                                             style: 'currency',
-                                            currency: 'VND'
+                                            currency: 'VND',
+                                            minimumFractionDigits: 0
                                         }).format(value);
                                     }
                                 }
@@ -277,8 +420,24 @@
                     }
                 });
             } catch (error) {
-                console.error('Error fetching daily revenue chart:', error);
+                console.error('Error fetching revenue chart:', error);
             }
+        }
+
+        // Switch chart type
+        function switchChart(type) {
+            currentChartType = type;
+            
+            // Show/hide month selector
+            const monthSelector = document.getElementById('month-selector');
+            if (type === 'monthly') {
+                monthSelector.style.display = 'none';
+            } else {
+                monthSelector.style.display = 'flex';
+            }
+            
+            // Fetch new data
+            fetchRevenueChart(type);
         }
 
         // Fetch recent orders
@@ -309,7 +468,7 @@
                                 style: 'currency',
                                 currency: 'VND'
                             }).format(parseFloat(order.total_price))}</div>
-                            <small class="text-muted">${new Date(order.created_at).toLocaleDateString('vi-VN')}</small>
+                            <small class="text-muted">${new Date(order.createdAt).toLocaleDateString('vi-VN')}</small>
                         </div>
                     </div>
                 `).join('');
@@ -323,7 +482,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             fetchMetrics();
             fetchRevenueOverview();
-            fetchDailyRevenueChart();
+            fetchRevenueChart('daily'); // Start with daily chart
             fetchRecentOrders();
         });
 

@@ -136,6 +136,7 @@
                             <th>Lượt xem</th>
                             <th>Lượt thích</th>
                             <th>Ngày tạo</th>
+                            <th>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody id="news-table">
@@ -192,7 +193,7 @@
             const tbody = document.getElementById('news-table');
             if (allNews.length > 0) {
                 tbody.innerHTML = allNews.map(news => `
-                    <tr class="news-card" onclick="showDropdownMenu(event, ${news.id})">
+                    <tr class="news-card">
                         <td>${news.id}</td>
                         <td>
                             <div class="fw-bold">${news.title}</div>
@@ -216,11 +217,24 @@
                         </td>
                         <td>${news.view_count || 0}</td>
                         <td>${news.like_count || 0}</td>
-                        <td>${news.createdAt ? new Date(news.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</td>
+                        <td>${news.created_at ? new Date(news.created_at).toLocaleDateString('vi-VN') : 'N/A'}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="/admin/news/${news.id}" class="btn btn-sm btn-info" title="Xem chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="/admin/news/${news.id}/edit" class="btn btn-sm btn-warning" title="Chỉnh sửa">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button class="btn btn-sm btn-danger" onclick="deleteNews(${news.id})" title="Xóa">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                 `).join('');
             } else {
-                tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Không có tin tức nào</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">Không có tin tức nào</td></tr>';
             }
             
             updatePagination();
@@ -228,7 +242,7 @@
             
         } catch (error) {
             console.error('Error fetching news:', error);
-            document.getElementById('news-table').innerHTML = '<tr><td colspan="8" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
+            document.getElementById('news-table').innerHTML = '<tr><td colspan="9" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
         }
     }
     
@@ -263,133 +277,6 @@
         }
     }
     
-    // Show dropdown menu
-    function showDropdownMenu(event, newsId) {
-        event.stopPropagation();
-        
-        // Remove existing dropdowns
-        document.querySelectorAll('.dropdown-menu').forEach(menu => menu.remove());
-        
-        const row = event.currentTarget;
-        const rect = row.getBoundingClientRect();
-        
-        const dropdown = document.createElement('div');
-        dropdown.className = 'dropdown-menu show';
-        dropdown.style.position = 'fixed';
-        dropdown.style.left = rect.right - 120 + 'px';
-        dropdown.style.top = rect.bottom + 'px';
-        dropdown.style.zIndex = '1000';
-        
-        dropdown.innerHTML = `
-            <a class="dropdown-item" href="/admin/news/${newsId}">
-                <i class="fas fa-eye me-2"></i>Xem chi tiết
-            </a>
-            <a class="dropdown-item" href="/admin/news/${newsId}/edit">
-                <i class="fas fa-edit me-2"></i>Chỉnh sửa
-            </a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item text-success" href="#" onclick="approveNews(${newsId})">
-                <i class="fas fa-check me-2"></i>Duyệt
-            </a>
-            <a class="dropdown-item text-warning" href="#" onclick="publishNews(${newsId})">
-                <i class="fas fa-upload me-2"></i>Xuất bản
-            </a>
-            <a class="dropdown-item text-danger" href="#" onclick="rejectNews(${newsId})">
-                <i class="fas fa-times me-2"></i>Từ chối
-            </a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item text-danger" href="#" onclick="deleteNews(${newsId})">
-                <i class="fas fa-trash me-2"></i>Xóa
-            </a>
-        `;
-        
-        document.body.appendChild(dropdown);
-        
-        // Close dropdown when clicking outside
-        setTimeout(() => {
-            document.addEventListener('click', function closeDropdown() {
-                dropdown.remove();
-                document.removeEventListener('click', closeDropdown);
-            });
-        }, 100);
-    }
-    
-    // Approve news
-    async function approveNews(newsId) {
-        if (confirm('Bạn có chắc chắn muốn duyệt tin tức này?')) {
-            try {
-                const response = await fetch(`/admin/news/${newsId}/approve`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Content-Type': 'application/json',
-                    },
-                });
-                
-                if (response.ok) {
-                    alert('Tin tức đã được duyệt!');
-                    fetchNews(currentPage);
-                } else {
-                    alert('Có lỗi xảy ra khi duyệt tin tức!');
-                }
-            } catch (error) {
-                console.error('Error approving news:', error);
-                alert('Có lỗi xảy ra khi duyệt tin tức!');
-            }
-        }
-    }
-    
-    // Publish news
-    async function publishNews(newsId) {
-        if (confirm('Bạn có chắc chắn muốn xuất bản tin tức này?')) {
-            try {
-                const response = await fetch(`/admin/news/${newsId}/publish`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Content-Type': 'application/json',
-                    },
-                });
-                
-                if (response.ok) {
-                    alert('Tin tức đã được xuất bản!');
-                    fetchNews(currentPage);
-                } else {
-                    alert('Có lỗi xảy ra khi xuất bản tin tức!');
-                }
-            } catch (error) {
-                console.error('Error publishing news:', error);
-                alert('Có lỗi xảy ra khi xuất bản tin tức!');
-            }
-        }
-    }
-    
-    // Reject news
-    async function rejectNews(newsId) {
-        const reason = prompt('Nhập lý do từ chối:');
-        if (reason && reason.trim()) {
-            try {
-                const response = await fetch(`/admin/news/${newsId}/reject`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ rejection_reason: reason }),
-                });
-                
-                if (response.ok) {
-                    alert('Tin tức đã bị từ chối!');
-                    fetchNews(currentPage);
-                } else {
-                    alert('Có lỗi xảy ra khi từ chối tin tức!');
-                }
-            } catch (error) {
-                console.error('Error rejecting news:', error);
-                alert('Có lỗi xảy ra khi từ chối tin tức!');
-            }
-        }
-    }
     
     // Delete news
     async function deleteNews(newsId) {

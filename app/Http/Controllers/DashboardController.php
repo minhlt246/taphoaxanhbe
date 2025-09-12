@@ -42,29 +42,29 @@ class DashboardController extends Controller
             'total_articles' => News::count(),
             
             // Hôm nay
-            'today_orders' => Order::whereDate('created_at', $today)->count(),
-            'today_revenue' => Order::whereDate('created_at', $today)->sum('total_price'),
+            'today_orders' => Order::whereDate('createdAt', $today)->count(),
+            'today_revenue' => Order::whereDate('createdAt', $today)->sum('total_price'),
             'today_users' => User::whereDate('created_at', $today)->count(),
             
             // Hôm qua
-            'yesterday_orders' => Order::whereDate('created_at', $yesterday)->count(),
-            'yesterday_revenue' => Order::whereDate('created_at', $yesterday)->sum('total_price'),
+            'yesterday_orders' => Order::whereDate('createdAt', $yesterday)->count(),
+            'yesterday_revenue' => Order::whereDate('createdAt', $yesterday)->sum('total_price'),
             
             // Tuần này
-            'this_week_orders' => Order::where('created_at', '>=', $thisWeek)->count(),
-            'this_week_revenue' => Order::where('created_at', '>=', $thisWeek)->sum('total_price'),
+            'this_week_orders' => Order::where('createdAt', '>=', $thisWeek)->count(),
+            'this_week_revenue' => Order::where('createdAt', '>=', $thisWeek)->sum('total_price'),
             
             // Tuần trước
-            'last_week_orders' => Order::whereBetween('created_at', [$lastWeek, $thisWeek])->count(),
-            'last_week_revenue' => Order::whereBetween('created_at', [$lastWeek, $thisWeek])->sum('total_price'),
+            'last_week_orders' => Order::whereBetween('createdAt', [$lastWeek, $thisWeek])->count(),
+            'last_week_revenue' => Order::whereBetween('createdAt', [$lastWeek, $thisWeek])->sum('total_price'),
             
             // Tháng này
-            'this_month_orders' => Order::where('created_at', '>=', $thisMonth)->count(),
-            'this_month_revenue' => Order::where('created_at', '>=', $thisMonth)->sum('total_price'),
+            'this_month_orders' => Order::where('createdAt', '>=', $thisMonth)->count(),
+            'this_month_revenue' => Order::where('createdAt', '>=', $thisMonth)->sum('total_price'),
             
             // Tháng trước
-            'last_month_orders' => Order::whereBetween('created_at', [$lastMonth, $thisMonth])->count(),
-            'last_month_revenue' => Order::whereBetween('created_at', [$lastMonth, $thisMonth])->sum('total_price'),
+            'last_month_orders' => Order::whereBetween('createdAt', [$lastMonth, $thisMonth])->count(),
+            'last_month_revenue' => Order::whereBetween('createdAt', [$lastMonth, $thisMonth])->sum('total_price'),
             
             // Trạng thái đơn hàng
             'pending_orders' => Order::where('status', 'pending')->count(),
@@ -73,9 +73,9 @@ class DashboardController extends Controller
             'cancelled_orders' => Order::where('status', 'cancelled')->count(),
             
             // Đánh giá
-            'pending_reviews' => DB::table('rating')->where('status', 'pending')->count(),
-            'approved_reviews' => DB::table('rating')->where('status', 'approved')->count(),
-            'rejected_reviews' => DB::table('rating')->where('status', 'rejected')->count(),
+            'pending_reviews' => 0,
+            'approved_reviews' => DB::table('rating')->count(),
+            'rejected_reviews' => 0,
             
             // Bài viết
             'published_articles' => News::where('is_approved', true)->count(),
@@ -92,51 +92,80 @@ class DashboardController extends Controller
     {
         $revenue = [
             'total' => Order::sum('total_price'),
-            'today' => Order::whereDate('created_at', today())->sum('total_price'),
-            'yesterday' => Order::whereDate('created_at', today()->subDay())->sum('total_price'),
-            'this_week' => Order::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->sum('total_price'),
-            'last_week' => Order::whereBetween('created_at', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])->sum('total_price'),
-            'this_month' => Order::whereMonth('created_at', now()->month)->sum('total_price'),
-            'last_month' => Order::whereMonth('created_at', now()->subMonth()->month)->sum('total_price'),
+            'today' => Order::whereDate('createdAt', today())->sum('total_price'),
+            'yesterday' => Order::whereDate('createdAt', today()->subDay())->sum('total_price'),
+            'this_week' => Order::whereBetween('createdAt', [now()->startOfWeek(), now()->endOfWeek()])->sum('total_price'),
+            'last_week' => Order::whereBetween('createdAt', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])->sum('total_price'),
+            'this_month' => Order::whereMonth('createdAt', now()->month)->sum('total_price'),
+            'last_month' => Order::whereMonth('createdAt', now()->subMonth()->month)->sum('total_price'),
         ];
 
         return response()->json($revenue);
     }
 
     /**
-     * Get daily revenue chart data
+     * Get daily revenue chart data (by day of month for specific month)
      */
-    public function dailyRevenue(): JsonResponse
+    public function dailyRevenue(Request $request): JsonResponse
     {
-        $dailyRevenue = Order::select(
-            DB::raw('DATE(created_at) as date'),
-            DB::raw('SUM(total_price) as revenue')
-        )
-        ->where('created_at', '>=', now()->subDays(30))
-        ->groupBy('date')
-        ->orderBy('date')
-        ->get();
+        $month = $request->get('month', now()->format('Y-m'));
+        $data = [];
+        
+        // Parse tháng được chọn
+        $selectedMonth = \Carbon\Carbon::createFromFormat('Y-m', $month);
+        $daysInMonth = $selectedMonth->daysInMonth;
+        
+        // Nếu là tháng 9/2025, chỉ hiển thị đến ngày 13
+        if ($month === '2025-09') {
+            $daysInMonth = 13;
+        }
+        
+        // Lấy doanh thu theo từng ngày trong tháng
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $revenue = Order::whereRaw('DAY(createdAt) = ?', [$day])
+                ->whereRaw('DATE_FORMAT(createdAt, "%Y-%m") = ?', [$month])
+                ->sum('total_price');
+            
+            $data[] = [
+                'date' => 'Ngày ' . $day,
+                'revenue' => $revenue
+            ];
+        }
 
-        return response()->json($dailyRevenue);
+        return response()->json($data);
     }
 
     /**
      * Get weekly revenue chart data
      */
-    public function weeklyRevenue(): JsonResponse
+    public function weeklyRevenue(Request $request): JsonResponse
     {
-        $weeklyRevenue = Order::select(
-            DB::raw('WEEK(created_at) as week'),
-            DB::raw('YEAR(created_at) as year'),
-            DB::raw('SUM(total_price) as revenue')
-        )
-        ->where('created_at', '>=', now()->subWeeks(12))
-        ->groupBy('year', 'week')
-        ->orderBy('year')
-        ->orderBy('week')
-        ->get();
+        $month = $request->get('month', now()->format('Y-m'));
+        $data = [];
+        
+        // Parse tháng được chọn
+        $selectedMonth = \Carbon\Carbon::createFromFormat('Y-m', $month);
+        
+        // Lấy 4 tuần trong tháng được chọn
+        for ($week = 1; $week <= 4; $week++) {
+            $startOfWeek = $selectedMonth->copy()->startOfMonth()->addWeeks($week - 1)->startOfWeek();
+            $endOfWeek = $selectedMonth->copy()->startOfMonth()->addWeeks($week - 1)->endOfWeek();
+            
+            // Đảm bảo không vượt quá tháng được chọn
+            if ($endOfWeek->gt($selectedMonth->copy()->endOfMonth())) {
+                $endOfWeek = $selectedMonth->copy()->endOfMonth();
+            }
+            
+            $revenue = Order::whereBetween('createdAt', [$startOfWeek, $endOfWeek])
+                ->sum('total_price');
+            
+            $data[] = [
+                'date' => 'Tuần ' . $week,
+                'revenue' => $revenue
+            ];
+        }
 
-        return response()->json($weeklyRevenue);
+        return response()->json($data);
     }
 
     /**
@@ -144,18 +173,28 @@ class DashboardController extends Controller
      */
     public function monthlyRevenue(): JsonResponse
     {
-        $monthlyRevenue = Order::select(
-            DB::raw('MONTH(created_at) as month'),
-            DB::raw('YEAR(created_at) as year'),
-            DB::raw('SUM(total_price) as revenue')
-        )
-        ->where('created_at', '>=', now()->subMonths(12))
-        ->groupBy('year', 'month')
-        ->orderBy('year')
-        ->orderBy('month')
-        ->get();
+        // Báo cáo doanh thu từ tháng 5/2025 đến hiện tại
+        $data = [];
+        $startMonth = \Carbon\Carbon::create(2025, 5, 1);
+        $currentMonth = now()->startOfMonth();
+        
+        $month = $startMonth->copy();
+        while ($month->lte($currentMonth)) {
+            $startOfMonth = $month->copy()->startOfMonth();
+            $endOfMonth = $month->copy()->endOfMonth();
+            
+            $revenue = Order::whereBetween('createdAt', [$startOfMonth, $endOfMonth])
+                ->sum('total_price');
+            
+            $data[] = [
+                'date' => $startOfMonth->format('m/Y'),
+                'revenue' => $revenue
+            ];
+            
+            $month->addMonth();
+        }
 
-        return response()->json($monthlyRevenue);
+        return response()->json($data);
     }
 
     /**
@@ -164,7 +203,7 @@ class DashboardController extends Controller
     public function recentOrders(): JsonResponse
     {
         $recentOrders = Order::with('user')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('createdAt', 'desc')
             ->limit(10)
             ->get();
 
@@ -183,7 +222,7 @@ class DashboardController extends Controller
             'total_reviews' => DB::table('rating')->count(),
             'total_articles' => News::count(),
             'total_revenue' => Order::sum('total_price'),
-            'pending_reviews' => DB::table('rating')->where('status', 'pending')->count(),
+            'pending_reviews' => 0,
             'pending_articles' => News::where('is_approved', false)->count(),
         ];
 

@@ -41,13 +41,7 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h6 class="m-0 font-weight-bold text-primary">Danh sách đánh giá</h6>
                         <div class="d-flex gap-2 align-items-center">
-                            <label class="form-label mb-0 me-2">Lọc theo trạng thái:</label>
-                            <select class="form-select form-select-sm" id="statusFilter" onchange="filterByStatus()" style="width: 150px;">
-                                <option value="">Tất cả</option>
-                                <option value="pending">Chờ duyệt</option>
-                                <option value="approved">Đã duyệt</option>
-                                <option value="rejected">Đã từ chối</option>
-                            </select>
+                            <span class="text-muted">Danh sách đánh giá sản phẩm</span>
                         </div>
                     </div>
                     <div class="card-body">
@@ -60,13 +54,12 @@
                                         <th>Khách hàng</th>
                                         <th>Đánh giá</th>
                                         <th>Bình luận</th>
-                                        <th>Trạng thái</th>
                                         <th>Ngày tạo</th>
                                     </tr>
                                 </thead>
                                 <tbody id="reviews-table">
                                     <tr>
-                                        <td colspan="7" class="text-center">
+                                        <td colspan="6" class="text-center">
                                             <div class="spinner-border" role="status">
                                                 <span class="visually-hidden">Loading...</span>
                                             </div>
@@ -91,32 +84,6 @@
         </div>
     </div>
 
-    <!-- Modal cập nhật trạng thái đánh giá -->
-    <div class="modal fade" id="reviewStatusModal" tabindex="-1" aria-labelledby="reviewStatusModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="reviewStatusModalLabel">Cập nhật trạng thái đánh giá</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Đánh giá ID: <strong id="reviewId"></strong></p>
-                    <div class="mb-3">
-                        <label for="newReviewStatus" class="form-label">Trạng thái mới:</label>
-                        <select class="form-select" id="newReviewStatus">
-                            <option value="pending">Chờ duyệt</option>
-                            <option value="approved">Đã duyệt</option>
-                            <option value="rejected">Đã từ chối</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" onclick="updateReviewStatus()">Cập nhật</button>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 
 @push('scripts')
@@ -129,7 +96,7 @@
         
         // Fetch reviews data
     async function fetchReviews(page = 1) {
-        fetchReviewsWithFilter('', page);
+        fetchReviewsWithFilter(page);
     }
     
     // Display reviews
@@ -149,19 +116,11 @@
                                 </div>
                             </td>
                             <td>${review.comment ? review.comment.substring(0, 50) + '...' : 'Không có bình luận'}</td>
-                            <td>
-                                <span class="badge ${getStatusBadgeClass(review.status)}" 
-                                      style="cursor: pointer;" 
-                                      onclick="showReviewStatusModal(${review.id}, '${review.status}')"
-                                      title="Click để cập nhật trạng thái">
-                                    ${getStatusText(review.status)}
-                                </span>
-                            </td>
                             <td>${review.createdAt ? new Date(review.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</td>
                         </tr>
                     `).join('');
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Chưa có đánh giá nào</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Chưa có đánh giá nào</td></tr>';
                 }
     }
     
@@ -244,47 +203,14 @@
     // Change page
     function changePage(page) {
         if (page >= 1 && page <= totalPages && page !== currentPage) {
-            const statusFilter = document.getElementById('statusFilter').value;
-            fetchReviewsWithFilter(statusFilter, page);
+            fetchReviewsWithFilter(page);
             }
         }
 
-        function getStatusBadgeClass(status) {
-            switch(status) {
-                case 'pending': return 'bg-warning';
-                case 'approved': return 'bg-success';
-                case 'rejected': return 'bg-danger';
-                default: return 'bg-secondary';
-            }
-        }
-
-        function getStatusText(status) {
-            switch(status) {
-                case 'pending': return 'Chờ duyệt';
-                case 'approved': return 'Đã duyệt';
-                case 'rejected': return 'Từ chối';
-                default: return status;
-            }
-        }
-
-        // Lọc đánh giá theo trạng thái
-        function filterByStatus() {
-            const statusFilter = document.getElementById('statusFilter').value;
-        
-        // Reset về trang 1 khi filter
-        currentPage = 1;
-        
-        // Fetch reviews với filter
-        fetchReviewsWithFilter(statusFilter, 1);
-    }
-    
     // Fetch reviews với filter
-    async function fetchReviewsWithFilter(status = '', page = 1) {
+    async function fetchReviewsWithFilter(page = 1) {
         try {
             let url = `/api/reviews?page=${page}&limit=${reviewsPerPage}`;
-            if (status) {
-                url += `&status=${status}`;
-            }
             
             const response = await fetch(url);
             const data = await response.json();
@@ -299,73 +225,7 @@
             updatePagination();
         } catch (error) {
             console.error('Error fetching reviews:', error);
-            document.getElementById('reviews-table').innerHTML = '<tr><td colspan="7" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
-            }
-        }
-
-        // Biến lưu trữ review ID hiện tại
-        let currentReviewId = null;
-
-        // Hiển thị modal cập nhật trạng thái đánh giá
-        function showReviewStatusModal(reviewId, currentStatus) {
-            currentReviewId = reviewId;
-            
-            // Hiển thị review ID
-            document.getElementById('reviewId').textContent = reviewId;
-            
-            // Set trạng thái hiện tại
-            document.getElementById('newReviewStatus').value = currentStatus;
-            
-            // Hiển thị modal
-            const modal = new bootstrap.Modal(document.getElementById('reviewStatusModal'));
-            modal.show();
-        }
-
-        // Cập nhật trạng thái đánh giá
-        async function updateReviewStatus() {
-            if (!currentReviewId) return;
-            
-            const newStatus = document.getElementById('newReviewStatus').value;
-            
-            try {
-                let endpoint = '';
-                switch(newStatus) {
-                    case 'approved':
-                        endpoint = `/api/reviews/${currentReviewId}/approve`;
-                        break;
-                    case 'rejected':
-                        endpoint = `/api/reviews/${currentReviewId}/reject`;
-                        break;
-                    case 'pending':
-                        // Nếu chuyển về pending, có thể cần API riêng hoặc xử lý khác
-                        alert('Không thể chuyển đánh giá về trạng thái chờ duyệt');
-                        return;
-                }
-                
-                if (endpoint) {
-                    const response = await fetch(endpoint, {
-                        method: 'GET'
-                    });
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        alert(data.message || 'Trạng thái đánh giá đã được cập nhật');
-                    
-                    // Reload với filter hiện tại
-                    const statusFilter = document.getElementById('statusFilter').value;
-                    fetchReviewsWithFilter(statusFilter, currentPage);
-                        
-                        // Đóng modal
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('reviewStatusModal'));
-                        modal.hide();
-                    } else {
-                        const errorData = await response.json();
-                        alert(errorData.message || 'Có lỗi xảy ra khi cập nhật trạng thái đánh giá');
-                    }
-                }
-            } catch (error) {
-                console.error('Error updating review status:', error);
-                alert('Có lỗi xảy ra khi cập nhật trạng thái đánh giá');
+            document.getElementById('reviews-table').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
             }
         }
 

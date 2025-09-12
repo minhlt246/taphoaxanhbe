@@ -27,11 +27,6 @@ class ReviewController extends Controller
     {
         $query = \App\Models\Review::with(['product', 'user'])->orderBy('createdAt', 'desc');
         
-        // Filter by status if provided
-        if ($request->has('status') && $request->status) {
-            $query->where('status', $request->status);
-        }
-        
         // Get pagination parameters
         $perPage = $request->get('limit', 20);
         $page = $request->get('page', 1);
@@ -114,8 +109,8 @@ class ReviewController extends Controller
         $review = \App\Models\Review::findOrFail($id);
         $review->update([
             'status' => 'approved',
-            'moderated_by' => auth()->id() ?? 1, // Default to admin ID 1 if not authenticated
-            'moderated_at' => now(),
+            'admin_id' => auth()->id() ?? 1, // Default to admin ID 1 if not authenticated
+            'reviewed_at' => now(),
         ]);
 
         if (request()->expectsJson() || request()->is('api/*')) {
@@ -136,8 +131,8 @@ class ReviewController extends Controller
         $review = \App\Models\Review::findOrFail($id);
         $review->update([
             'status' => 'rejected',
-            'moderated_by' => auth()->id() ?? 1, // Default to admin ID 1 if not authenticated
-            'moderated_at' => now(),
+            'admin_id' => auth()->id() ?? 1, // Default to admin ID 1 if not authenticated
+            'reviewed_at' => now(),
         ]);
 
         if (request()->expectsJson() || request()->is('api/*')) {

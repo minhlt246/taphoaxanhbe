@@ -177,7 +177,7 @@
                                     <path d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
                                 </svg>
                             </div>
-                            <span class="nav-text">Quản lý danh mục</span>
+                            <span class="nav-text">Quản lý danh mục </span>
                         </a>
                     </li>
                     <li class="nav-item">
