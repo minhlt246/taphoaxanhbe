@@ -6,18 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrderItem extends Model
 {
-    protected $table = 'cart_item';
+    protected $table = 'order_item';
     
     protected $fillable = [
         'order_id',
         'product_id',
         'quantity',
-        'price',
-        'total_price'
+        'unit_price',
+        'productVariant_id',
     ];
     
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
+    const CREATED_AT = 'createdAt';
+    const UPDATED_AT = 'updatedAt';
     
     public function order()
     {
