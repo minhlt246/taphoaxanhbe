@@ -25,7 +25,7 @@ class ReviewController extends Controller
      */
     public function apiIndex(Request $request)
     {
-        $query = \App\Models\Review::with(['product', 'user'])->orderBy('created_at', 'desc');
+        $query = \App\Models\Review::with(['product', 'user'])->orderBy('createdAt', 'desc');
         
         // Filter by status if provided
         if ($request->has('status') && $request->status) {

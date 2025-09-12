@@ -216,7 +216,7 @@
                         </td>
                         <td>${news.view_count || 0}</td>
                         <td>${news.like_count || 0}</td>
-                        <td>${news.created_at ? new Date(news.created_at).toLocaleDateString('vi-VN') : 'N/A'}</td>
+                        <td>${news.createdAt ? new Date(news.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</td>
                     </tr>
                 `).join('');
             } else {

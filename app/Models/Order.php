@@ -11,7 +11,7 @@ class Order extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'orders';
+    protected $table = 'order';
 
     protected $fillable = [
         'total_price',
@@ -22,9 +22,9 @@ class Order extends Model
         'user_id',
     ];
 
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
-    const DELETED_AT = 'deleted_at';
+    const CREATED_AT = 'createdAt';
+    const UPDATED_AT = 'updatedAt';
+    const DELETED_AT = 'deletedAt';
 
     protected $casts = [
         'total_price' => 'decimal:2',

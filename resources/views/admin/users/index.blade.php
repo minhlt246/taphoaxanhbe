@@ -107,7 +107,7 @@
                                 ${getRoleText(user.role || 'USER')}
                             </span>
                         </td>
-                        <td>${user.created_at ? new Date(user.created_at).toLocaleDateString('vi-VN') : 'N/A'}</td>
+                        <td>${user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</td>
                         <td>
                             <span class="badge ${getStatusBadgeClass(user.status || 'active')}">
                                 ${getStatusText(user.status || 'active')}

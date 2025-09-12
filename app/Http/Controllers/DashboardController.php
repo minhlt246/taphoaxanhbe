@@ -38,7 +38,7 @@ class DashboardController extends Controller
             'total_orders' => Order::count(),
             'total_revenue' => Order::sum('total_price'),
             'total_products' => Product::count(),
-            'total_reviews' => DB::table('reviews')->count(),
+            'total_reviews' => DB::table('rating')->count(),
             'total_articles' => News::count(),
             
             // Hôm nay
@@ -73,9 +73,9 @@ class DashboardController extends Controller
             'cancelled_orders' => Order::where('status', 'cancelled')->count(),
             
             // Đánh giá
-            'pending_reviews' => DB::table('reviews')->where('status', 'pending')->count(),
-            'approved_reviews' => DB::table('reviews')->where('status', 'approved')->count(),
-            'rejected_reviews' => DB::table('reviews')->where('status', 'rejected')->count(),
+            'pending_reviews' => DB::table('rating')->where('status', 'pending')->count(),
+            'approved_reviews' => DB::table('rating')->where('status', 'approved')->count(),
+            'rejected_reviews' => DB::table('rating')->where('status', 'rejected')->count(),
             
             // Bài viết
             'published_articles' => News::where('is_approved', true)->count(),
@@ -180,10 +180,10 @@ class DashboardController extends Controller
             'total_users' => User::count(),
             'total_orders' => Order::count(),
             'total_products' => Product::count(),
-            'total_reviews' => DB::table('reviews')->count(),
+            'total_reviews' => DB::table('rating')->count(),
             'total_articles' => News::count(),
             'total_revenue' => Order::sum('total_price'),
-            'pending_reviews' => DB::table('reviews')->where('status', 'pending')->count(),
+            'pending_reviews' => DB::table('rating')->where('status', 'pending')->count(),
             'pending_articles' => News::where('is_approved', false)->count(),
         ];
 

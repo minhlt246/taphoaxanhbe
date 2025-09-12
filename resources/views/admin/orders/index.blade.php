@@ -208,7 +208,7 @@
                                     ${getPaymentText(order.payment)}
                                 </span>
                             </td>
-                            <td>${order.created_at ? new Date(order.created_at).toLocaleDateString('vi-VN') : 'N/A'}</td>
+                            <td>${order.createdAt ? new Date(order.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</td>
                         </tr>
                     `).join('');
                 } else {

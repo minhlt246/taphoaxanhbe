@@ -30,7 +30,7 @@ class OrderController extends Controller
         $timeFilter = $request->get('time');
         $monthFilter = $request->get('month');
         
-        $query = \App\Models\Order::with('user')->orderBy('created_at', 'desc');
+        $query = \App\Models\Order::with('user')->orderBy('createdAt', 'desc');
         
         // Filter by status if provided
         if ($statusFilter) {
@@ -41,18 +41,18 @@ class OrderController extends Controller
         if ($timeFilter) {
             switch ($timeFilter) {
                 case 'today':
-                    $query->whereDate('created_at', today());
+                    $query->whereDate('createdAt', today());
                     break;
                 case 'week':
-                    $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+                    $query->whereBetween('createdAt', [now()->startOfWeek(), now()->endOfWeek()]);
                     break;
                 case 'month':
-                    $query->whereMonth('created_at', now()->month)
-                          ->whereYear('created_at', now()->year);
+                    $query->whereMonth('createdAt', now()->month)
+                          ->whereYear('createdAt', now()->year);
                     break;
                 case 'last_month':
-                    $query->whereMonth('created_at', now()->subMonth()->month)
-                          ->whereYear('created_at', now()->subMonth()->year);
+                    $query->whereMonth('createdAt', now()->subMonth()->month)
+                          ->whereYear('createdAt', now()->subMonth()->year);
                     break;
             }
         }
@@ -60,8 +60,8 @@ class OrderController extends Controller
         // Filter by specific month
         if ($monthFilter) {
             $monthDate = \Carbon\Carbon::createFromFormat('Y-m', $monthFilter);
-            $query->whereMonth('created_at', $monthDate->month)
-                  ->whereYear('created_at', $monthDate->year);
+            $query->whereMonth('createdAt', $monthDate->month)
+                  ->whereYear('createdAt', $monthDate->year);
         }
         
         $orders = $query->paginate($perPage);

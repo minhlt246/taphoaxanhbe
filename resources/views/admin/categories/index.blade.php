@@ -97,7 +97,7 @@
                         <td>
                             ${category.parent ? `<span class="badge bg-secondary">${category.parent.name}</span>` : '<span class="text-muted">Danh mục gốc</span>'}
                         </td>
-                        <td>${category.created_at ? new Date(category.created_at).toLocaleDateString('vi-VN') : 'N/A'}</td>
+                        <td>${category.createdAt ? new Date(category.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</td>
                         <td>
                             <div class="btn-group" role="group">
                                 <a href="/admin/categories/${category.id}" class="btn btn-sm btn-info" title="Xem chi tiết">

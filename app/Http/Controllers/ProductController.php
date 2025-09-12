@@ -23,14 +23,14 @@ class ProductController extends Controller
         
         // Get products for the view
         $products = Product::with(['category'])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('createdAt', 'desc')
             ->paginate(20);
         
         // Get total statistics for all products (not just paginated)
         $totalProducts = Product::count();
         $inStockProducts = Product::where('quantity', '>', 0)->count();
         $outOfStockProducts = Product::where('quantity', '=', 0)->count();
-        $activeProducts = Product::where('status', 'active')->count();
+        $activeProducts = Product::where('quantity', '>', 0)->count();
         
         // Otherwise return view with data
         return view('admin.products.index', compact('products', 'totalProducts', 'inStockProducts', 'outOfStockProducts', 'activeProducts'));
@@ -68,7 +68,7 @@ class ProductController extends Controller
         }
 
         $perPage = $request->get('limit', 20);
-        $products = $query->orderBy('created_at', 'desc')->paginate($perPage);
+        $products = $query->orderBy('createdAt', 'desc')->paginate($perPage);
 
         return response()->json([
             'products' => $products->items(),
@@ -103,7 +103,7 @@ class ProductController extends Controller
             'brand_id' => 'nullable|integer',
             'images' => 'nullable|array',
             'stock' => 'nullable|integer|min:0',
-            'status' => 'nullable|string|in:active,inactive',
+            // 'status' => 'nullable|string|in:active,inactive', // Bảng product không có cột status
         ]);
 
         // Check if product name already exists
@@ -127,7 +127,7 @@ class ProductController extends Controller
             'images' => $request->images,
             'quantity' => $quantity,
             'totalQuantity' => $quantity, // Set totalQuantity = quantity khi tạo mới
-            'status' => $request->status ?? 'active',
+            // 'status' => $request->status ?? 'active', // Bảng product không có cột status
             'slug' => Str::slug($request->name),
             'created_by' => Auth::id(),
             'updated_by' => Auth::id(),
@@ -184,7 +184,7 @@ class ProductController extends Controller
             'brand_id' => 'nullable|integer',
             'images' => 'nullable|array',
             'stock' => 'nullable|integer|min:0',
-            'status' => 'nullable|string|in:active,inactive',
+            // 'status' => 'nullable|string|in:active,inactive', // Bảng product không có cột status
         ]);
 
         // Check if product name already exists (excluding current product)
@@ -252,8 +252,8 @@ class ProductController extends Controller
     {
         $stats = [
             'total' => Product::count(),
-            'active' => Product::where('status', 'active')->count(),
-            'inactive' => Product::where('status', 'inactive')->count(),
+            'active' => Product::where('quantity', '>', 0)->count(),
+            'inactive' => Product::where('quantity', '=', 0)->count(),
             'in_stock' => Product::where('quantity', '>', 0)->count(),
             'out_of_stock' => Product::where('quantity', '=', 0)->count(),
             'total_stock' => Product::sum('quantity'),

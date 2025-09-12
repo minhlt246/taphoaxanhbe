@@ -306,11 +306,11 @@
                             </span>
                         </td>
                         <td>
-                            <span class="badge ${product.status === 'active' ? 'bg-success' : 'bg-secondary'}">
-                                ${product.status === 'active' ? 'Hoạt động' : 'Tạm dừng'}
+                            <span class="badge ${product.quantity > 0 ? 'bg-success' : 'bg-secondary'}">
+                                ${product.quantity > 0 ? 'Hoạt động' : 'Tạm dừng'}
                             </span>
                         </td>
-                        <td>${product.created_at ? new Date(product.created_at).toLocaleDateString('vi-VN') : 'N/A'}</td>
+                        <td>${product.createdAt ? new Date(product.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</td>
                     </tr>
                 `).join('');
             } else {

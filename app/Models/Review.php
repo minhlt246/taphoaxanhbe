@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Review extends Model
 {
-    protected $table = 'reviews';
+    protected $table = 'rating';
 
     protected $fillable = [
         'product_id',
