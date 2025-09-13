@@ -301,13 +301,13 @@
                             ${product.discount > 0 ? `<small class="text-success">Giảm ${product.discount}%</small>` : ''}
                         </td>
                         <td>
-                            <span class="badge ${product.actual_quantity > 0 ? 'bg-success' : 'bg-danger'}">
-                                ${product.actual_quantity}/${product.total_quantity || product.quantity}
+                            <span class="badge ${product.quantity > 0 ? 'bg-success' : 'bg-danger'}">
+                                ${product.quantity}/${product.total_quantity || product.quantity}
                             </span>
                         </td>
                         <td>
-                            <span class="badge ${product.actual_quantity > 0 ? 'bg-success' : 'bg-secondary'}">
-                                ${product.actual_quantity > 0 ? 'Hoạt động' : 'Tạm dừng'}
+                            <span class="badge ${product.quantity > 0 ? 'bg-success' : 'bg-secondary'}">
+                                ${product.quantity > 0 ? 'Hoạt động' : 'Tạm dừng'}
                             </span>
                         </td>
                         <td>${product.createdAt ? new Date(product.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</td>
